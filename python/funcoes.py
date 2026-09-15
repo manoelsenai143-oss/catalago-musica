@@ -19,6 +19,7 @@ def menu():
     print("5 - Excluir música")
     print("6 - Criar playlist")
     print("7 - Listar playlists")
+    print("8 - Adicionar música à playlist")
     print("0 - Sair")
 
 
@@ -139,6 +140,86 @@ def listar_playlists(cursor):
         for playlist in playlists:
             print(f"ID: {playlist[0]}")
             print(f"Nome: {playlist[1]}")
+
+            cursor.execute("""
+            SELECT musicas.titulo
+            FROM musicas
+            INNER JOIN playlist_musicas
+            ON musicas.id = playlist_musicas.id_musica
+            WHERE playlist_musicas.id_playlist = ?
+            """, (playlist[0],))
+
+            musicas = cursor.fetchall()
+
+            if musicas:
+                print("Músicas:")
+
+                for musica in musicas:
+                    print(f"- {musica[0]}")
+            else:
+                print("Nenhuma música nessa playlist.")
+
             print()
     else:
         print("Nenhuma playlist cadastrada.")
+
+
+def adicionar_musica_playlist(cursor, conexao):
+    id_playlist = input("Digite o ID da playlist: ")
+    id_musica = input("Digite o ID da música: ")
+
+    cursor.execute("""
+    SELECT * FROM playlists
+    WHERE id = ?
+    """, (id_playlist,))
+
+    playlist = cursor.fetchone()
+
+    cursor.execute("""
+    SELECT * FROM musicas
+    WHERE id = ?
+    """, (id_musica,))
+
+    musica = cursor.fetchone()
+
+    if playlist and musica:
+        cursor.execute("""
+        SELECT * FROM playlist_musicas
+        WHERE id_playlist = ? AND id_musica = ?
+        """, (id_playlist, id_musica))
+
+        existe = cursor.fetchone()
+
+        if existe:
+            print("Essa música já está nessa playlist.")
+        else:
+            cursor.execute("""
+            INSERT INTO playlist_musicas (id_playlist, id_musica)
+            VALUES (?, ?)
+            """, (id_playlist, id_musica))
+
+            conexao.commit()
+
+            print("Música adicionada à playlist!")
+    else:
+        print("Playlist ou música não encontrada.")
+
+
+def listar_musicas(cursor):
+    cursor.execute("SELECT * FROM musicas")
+    resultados = cursor.fetchall()
+
+    if resultados:
+        for musica in resultados:
+            print(f"ID: {musica[0]}")
+            print(f"Título: {musica[1]}")
+            print(f"Artista: {musica[2]}")
+            print(f"Álbum: {musica[3]}")
+            print(f"Gênero: {musica[4]}")
+            print()
+    else:
+        print("Nenhuma música cadastrada.")
+
+
+
+

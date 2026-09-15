@@ -1,7 +1,7 @@
 import sqlite3
 
 from dados import musicas
-from funcoes import menu, cadastrar_musica, buscar_musica, editar_musica, excluir_musica, criar_playlist, listar_playlists
+from funcoes import mostrar_musicas, menu, cadastrar_musica, buscar_musica, editar_musica, excluir_musica, criar_playlist, listar_playlists, adicionar_musica_playlist, listar_musicas
 
 conexao = sqlite3.connect("banco.db")
 
@@ -24,6 +24,16 @@ cursor.execute("""
 CREATE TABLE IF NOT EXISTS playlists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT NOT NULL
+)
+""")
+
+conexao.commit()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS playlist_musicas (
+    id_playlist INTEGER,
+    id_musica INTEGER,
+    PRIMARY KEY (id_playlist, id_musica)
 )
 """)
 
@@ -58,11 +68,7 @@ def main():
             cadastrar_musica(cursor, conexao)
 
         elif opcao == "2":
-            cursor.execute("SELECT * FROM musicas")
-            resultados = cursor.fetchall()
-
-            for musica in resultados:
-                print(musica)
+            listar_musicas(cursor)
 
         elif opcao == "3":
             buscar_musica(cursor)
@@ -78,6 +84,9 @@ def main():
 
         elif opcao == "7":
             listar_playlists(cursor)
+
+        elif opcao == "8":
+            adicionar_musica_playlist(cursor, conexao)
 
         elif opcao == "0":
             print("Programa encerrado")
