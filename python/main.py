@@ -1,7 +1,7 @@
 import sqlite3
 
 from dados import musicas
-from funcoes import mostrar_musicas, menu, cadastrar_musica, buscar_musica, editar_musica, excluir_musica, criar_playlist, listar_playlists, adicionar_musica_playlist, listar_musicas
+from funcoes import mostrar_musicas, menu, cadastrar_musica, buscar_musica, editar_musica, excluir_musica, criar_playlist, listar_playlists, adicionar_musica_playlist, listar_musicas, cadastrar_usuario, fazer_login
 
 conexao = sqlite3.connect("banco.db")
 
@@ -23,7 +23,8 @@ conexao.commit()
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS playlists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL
+    nome TEXT NOT NULL,
+    id_usuario INTEGER NOT NULL
 )
 """)
 
@@ -37,6 +38,16 @@ CREATE TABLE IF NOT EXISTS playlist_musicas (
 )
 """)
 
+conexao.commit()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_usuario TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    senha TEXT NOT NULL
+)
+""")
 conexao.commit()
 
 
@@ -58,6 +69,7 @@ if quantidade == 0:
 
     conexao.commit()
 
+id_usuario = None
 
 def main():
     while True:
@@ -65,28 +77,34 @@ def main():
         opcao = input("\nEscolha uma opção: ")
 
         if opcao == "1":
-            cadastrar_musica(cursor, conexao)
+            cadastrar_usuario(cursor, conexao)
 
         elif opcao == "2":
-            listar_musicas(cursor)
+            id_usuario = fazer_login(cursor)
 
         elif opcao == "3":
-            buscar_musica(cursor)
+            cadastrar_musica(cursor, conexao)
 
         elif opcao == "4":
-            editar_musica(cursor, conexao)
+            listar_musicas(cursor)
 
         elif opcao == "5":
-            excluir_musica(cursor, conexao)
+            buscar_musica(cursor)
 
         elif opcao == "6":
-            criar_playlist(cursor, conexao)
+            editar_musica(cursor, conexao)
 
         elif opcao == "7":
-            listar_playlists(cursor)
+            excluir_musica(cursor, conexao)
 
         elif opcao == "8":
-            adicionar_musica_playlist(cursor, conexao)
+            criar_playlist(cursor, conexao, id_usuario)
+
+        elif opcao == "9":
+            listar_playlists(cursor, id_usuario)
+
+        elif opcao == "10":
+            adicionar_musica_playlist(cursor, conexao, id_usuario)
 
         elif opcao == "0":
             print("Programa encerrado")

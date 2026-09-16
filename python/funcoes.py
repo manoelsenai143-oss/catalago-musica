@@ -12,15 +12,49 @@ def menu():
     print("       CATÁLOGO DE MÚSICA")
     print("================================")
     print()
-    print("1 - Cadastrar música")
-    print("2 - Listar músicas")
-    print("3 - Buscar música")
-    print("4 - Editar música")
-    print("5 - Excluir música")
-    print("6 - Criar playlist")
-    print("7 - Listar playlists")
-    print("8 - Adicionar música à playlist")
+    print("1 - Cadastrar usuário")
+    print("2 - Fazer login")
+    print("3 - Cadastrar música")
+    print("4 - Listar músicas")
+    print("5 - Buscar música")
+    print("6 - Editar música")
+    print("7 - Excluir música")
+    print("8 - Criar playlist")
+    print("9 - Listar playlists")
+    print("10 - Adicionar música à playlist")
     print("0 - Sair")
+
+def cadastrar_usuario(cursor, conexao):
+    nome = input("Digite o nome de usuário: ")
+    email = input("Digite o email: ")
+    senha = input("Digite a senha: ")
+
+    cursor.execute("""
+    INSERT INTO usuarios (nome_usuario, email, senha)
+    VALUES (?, ?, ?)
+    """, (nome, email, senha))
+
+    conexao.commit()
+    print("Usuário cadastrado com sucesso!")
+
+def fazer_login(cursor):
+    email = input("Digite o email: ")
+    senha = input("Digite a senha: ")
+
+    cursor.execute("""
+    SELECT id, nome_usuario
+    FROM usuarios
+    WHERE email = ? AND senha = ?
+    """, (email, senha))
+
+    usuario = cursor.fetchone()
+
+    if usuario:
+        print(f"Bem-vindo, {usuario[1]}!")
+        return usuario[0]
+
+    print("Email ou senha incorretos.")
+    return None
 
 
 def cadastrar_musica(cursor, conexao):
@@ -118,21 +152,24 @@ def excluir_musica(cursor, conexao):
         print("Música não encontrada.")
 
 
-def criar_playlist(cursor, conexao):
+def criar_playlist(cursor, conexao, id_usuario):
     nome = input("Digite o nome da playlist: ")
 
     cursor.execute("""
-    INSERT INTO playlists (nome)
-    VALUES (?)
-    """, (nome,))
+    INSERT INTO playlists (nome, id_usuario)
+    VALUES (?, ?)
+    """, (nome, id_usuario))
 
     conexao.commit()
 
     print("Playlist criada com sucesso!")
 
 
-def listar_playlists(cursor):
-    cursor.execute("SELECT * FROM playlists")
+def listar_playlists(cursor, id_usuario):
+    cursor.execute("""
+    SELECT * FROM playlists
+    WHERE id_usuario = ?
+    """, (id_usuario,))
 
     playlists = cursor.fetchall()
 
@@ -164,14 +201,14 @@ def listar_playlists(cursor):
         print("Nenhuma playlist cadastrada.")
 
 
-def adicionar_musica_playlist(cursor, conexao):
+def adicionar_musica_playlist(cursor, conexao, id_usuario):
     id_playlist = input("Digite o ID da playlist: ")
     id_musica = input("Digite o ID da música: ")
 
     cursor.execute("""
     SELECT * FROM playlists
-    WHERE id = ?
-    """, (id_playlist,))
+    WHERE id = ? AND id_usuario = ?
+    """, (id_playlist, id_usuario))
 
     playlist = cursor.fetchone()
 
