@@ -10,6 +10,8 @@ O sistema permite cadastrar músicas, pesquisar, editar e excluir músicas, alé
 
 ## Funcionalidades
 
+- Cadastrar usuário
+- Fazer login
 - Cadastrar músicas
 - Listar músicas
 - Buscar músicas
