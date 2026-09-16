@@ -41,6 +41,6 @@ O sistema permite cadastrar músicas, pesquisar, editar e excluir músicas, alé
 - Eduardo
 - Felipe
 
-![drawdb](catalogo-musica_2026-09-16T17_12_34.821Z.jpeg)
+![drawdb](catalogo-musica_2026-09-16T17_17_50.721Z.png)
 
 
