@@ -31,7 +31,7 @@ O sistema permite cadastrar músicas, pesquisar, editar e excluir músicas, alé
 
 - `main.py` → arquivo principal do sistema
 - `funcoes.py` → funções utilizadas pelo sistema
-- `dados.py` → dados iniciais das músicas
+- `dados1.py` → dados iniciais das músicas
 - `banco.db` → banco de dados SQLite
 - `README.md` → documentação do projeto
 

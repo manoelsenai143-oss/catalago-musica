@@ -1,225 +1,178 @@
-def mostrar_musicas(musicas):
-    for musica in musicas:
-        print(f"Título: {musica['titulo']}")
-        print(f"Artista: {musica['artista']}")
-        print(f"Álbum: {musica['album']}")
-        print(f"Gênero: {musica['genero']}")
-        print()
+from flask import Flask, jsonify, request
+import psycopg2
+
+app = Flask(__name__)
+
+# Configuração da conexão com o banco de dados (ajuste com os seus dados reais)
+def conectar_banco():
+    conexao = psycopg2.connect(
+        host="localhost",
+        database="nome_do_seu_banco",  # Substitua pelo seu banco
+        user="seu_usuario",              # Substitua pelo seu usuário
+        password="sua_senha"             # Substitua pela sua senha
+    )
+    # Força a codificação UTF-8 para evitar erros com acentos
+    conexao.set_client_encoding('UTF8')
+    return conexao
+
+# Rota para cadastrar usuário
+@app.route('/usuarios', methods=['POST'])
+def cadastrar_usuario():
+    dados = request.get_json()
+    nome = dados.get('nome_usuario')
+    email = dados.get('email')
+    senha = dados.get('senha')
+
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+    INSERT INTO usuarios (nome_usuario, email, senha)
+    VALUES (%s, %s, %s)
+    """, (nome, email, senha))
+
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+
+    return jsonify({"mensagem": "Usuário cadastrado com sucesso!"}), 201
 
 
-def menu():
-    print("================================")
-    print("       CATÁLOGO DE MÚSICA")
-    print("================================")
-    print()
-    print("1 - Cadastrar música")
-    print("2 - Listar músicas")
-    print("3 - Buscar música")
-    print("4 - Editar música")
-    print("5 - Excluir música")
-    print("6 - Criar playlist")
-    print("7 - Listar playlists")
-    print("8 - Adicionar música à playlist")
-    print("0 - Sair")
+# Rota para fazer login
+@app.route('/login', methods=['POST'])
+def fazer_login():
+    dados = request.get_json()
+    email = dados.get('email')
+    senha = dados.get('senha')
+
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+    SELECT id, nome_usuario
+    FROM usuarios
+    WHERE email = %s AND senha = %s
+    """, (email, senha))
+
+    usuario = cursor.fetchone()
+    cursor.close()
+    conexao.close()
+
+    if usuario:
+        return jsonify({
+            "mensagem": f"Bem-vindo, {usuario[1]}!",
+            "id_usuario": usuario[0]
+        }), 200
+
+    return jsonify({"erro": "Email ou senha incorretos."}), 401
 
 
-def cadastrar_musica(cursor, conexao):
-    titulo = input("Digite o título da música: ")
-    artista = input("Digite o artista: ")
-    album = input("Digite o álbum: ")
-    genero = input("Digite o gênero: ")
+# Rota para listar músicas
+@app.route('/musicas', methods=['GET'])
+def listar_musicas():
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    cursor.execute("SELECT * FROM musicas")
+    resultados = cursor.fetchall()
+    conexao.close()
+
+    musicas = []
+    for musica in resultados:
+        # Função auxiliar para limpar acentos problemáticos se houver erro de codificação
+        def limpar(texto):
+            if isinstance(texto, str):
+                try:
+                    return texto.encode('latin-1').decode('utf-8')
+                except:
+                    return texto
+            return str(texto)
+
+        musicas.append({
+            "id": musica["id"],
+            "titulo": limpar(musica["titulo"]),
+            "artista": limpar(musica["artista"]),
+            "album": limpar(musica["album"]),
+            "genero": limpar(musica["genero"])
+        })
+
+    return jsonify(musicas), 200
+@app.route('/musicas', methods=['POST'])
+def cadastrar_musica():
+    dados = request.get_json()
+    titulo = dados.get('titulo')
+    artista = dados.get('artista')
+    album = dados.get('album')
+    genero = dados.get('genero')
+
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
 
     cursor.execute("""
     INSERT INTO musicas (titulo, artista, album, genero)
-    VALUES (?, ?, ?, ?)
+    VALUES (%s, %s, %s, %s)
     """, (titulo, artista, album, genero))
 
     conexao.commit()
+    cursor.close()
+    conexao.close()
 
-    print("Música cadastrada com sucesso!")
+    return jsonify({"mensagem": "Música cadastrada com sucesso!"}), 201
 
 
-def buscar_musica(cursor):
-    titulo = input("Digite o título da música: ")
+# Rota para buscar música por título
+@app.route('/musicas/buscar', methods=['GET'])
+def buscar_musica():
+    titulo = request.args.get('titulo', '')
+
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
 
     cursor.execute("""
-    SELECT * FROM musicas
-    WHERE titulo LIKE ?
+    SELECT id, titulo, artista, album, genero FROM musicas
+    WHERE titulo ILIKE %s
     """, (f"%{titulo}%",))
 
     resultados = cursor.fetchall()
+    cursor.close()
+    conexao.close()
 
-    if resultados:
-        for musica in resultados:
-            print(f"ID: {musica[0]}")
-            print(f"Título: {musica[1]}")
-            print(f"Artista: {musica[2]}")
-            print(f"Álbum: {musica[3]}")
-            print(f"Gênero: {musica[4]}")
-            print()
-    else:
-        print("Música não encontrada.")
+    musicas = []
+    for musica in resultados:
+        musicas.append({
+            "id": musica[0],
+            "titulo": musica[1],
+            "artista": musica[2],
+            "album": musica[3],
+            "genero": musica[4]
+        })
 
-
-def editar_musica(cursor, conexao):
-    id_musica = input("Digite o ID da música que deseja editar: ")
-
-    cursor.execute(
-        "SELECT * FROM musicas WHERE id = ?",
-        (id_musica,)
-    )
-
-    musica = cursor.fetchone()
-
-    if musica:
-        titulo = input("Digite o novo título: ")
-        artista = input("Digite o novo artista: ")
-        album = input("Digite o novo álbum: ")
-        genero = input("Digite o novo gênero: ")
-
-        cursor.execute("""
-        UPDATE musicas
-        SET titulo = ?, artista = ?, album = ?, genero = ?
-        WHERE id = ?
-        """, (titulo, artista, album, genero, id_musica))
-
-        conexao.commit()
-
-        print("Música editada com sucesso!")
-    else:
-        print("Música não encontrada.")
+    return jsonify(musicas), 200
 
 
-def excluir_musica(cursor, conexao):
-    id_musica = input("Digite o ID da música que deseja excluir: ")
+# Rota para criar playlist
+@app.route('/playlists', methods=['POST'])
+def criar_playlist():
+    dados = request.get_json()
+    nome = dados.get('nome')
+    id_usuario = dados.get('id_usuario')
 
-    cursor.execute(
-        "SELECT * FROM musicas WHERE id = ?",
-        (id_musica,)
-    )
+    if not id_usuario:
+        return jsonify({"erro": "ID do usuário é obrigatório."}), 400
 
-    musica = cursor.fetchone()
-
-    if musica:
-        confirmacao = input("Tem certeza que deseja excluir? (s/n): ")
-
-        if confirmacao.lower() == "s":
-            cursor.execute(
-                "DELETE FROM musicas WHERE id = ?",
-                (id_musica,)
-            )
-
-            conexao.commit()
-
-            print("Música excluída com sucesso!")
-        else:
-            print("Exclusão cancelada.")
-    else:
-        print("Música não encontrada.")
-
-
-def criar_playlist(cursor, conexao):
-    nome = input("Digite o nome da playlist: ")
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
 
     cursor.execute("""
-    INSERT INTO playlists (nome)
-    VALUES (?)
-    """, (nome,))
+    INSERT INTO playlists (nome, id_usuario)
+    VALUES (%s, %s)
+    """, (nome, id_usuario))
 
     conexao.commit()
+    cursor.close()
+    conexao.close()
 
-    print("Playlist criada com sucesso!")
-
-
-def listar_playlists(cursor):
-    cursor.execute("SELECT * FROM playlists")
-
-    playlists = cursor.fetchall()
-
-    if playlists:
-        for playlist in playlists:
-            print(f"ID: {playlist[0]}")
-            print(f"Nome: {playlist[1]}")
-
-            cursor.execute("""
-            SELECT musicas.titulo
-            FROM musicas
-            INNER JOIN playlist_musicas
-            ON musicas.id = playlist_musicas.id_musica
-            WHERE playlist_musicas.id_playlist = ?
-            """, (playlist[0],))
-
-            musicas = cursor.fetchall()
-
-            if musicas:
-                print("Músicas:")
-
-                for musica in musicas:
-                    print(f"- {musica[0]}")
-            else:
-                print("Nenhuma música nessa playlist.")
-
-            print()
-    else:
-        print("Nenhuma playlist cadastrada.")
+    return jsonify({"mensagem": "Playlist criada com sucesso!"}), 201
 
 
-def adicionar_musica_playlist(cursor, conexao):
-    id_playlist = input("Digite o ID da playlist: ")
-    id_musica = input("Digite o ID da música: ")
-
-    cursor.execute("""
-    SELECT * FROM playlists
-    WHERE id = ?
-    """, (id_playlist,))
-
-    playlist = cursor.fetchone()
-
-    cursor.execute("""
-    SELECT * FROM musicas
-    WHERE id = ?
-    """, (id_musica,))
-
-    musica = cursor.fetchone()
-
-    if playlist and musica:
-        cursor.execute("""
-        SELECT * FROM playlist_musicas
-        WHERE id_playlist = ? AND id_musica = ?
-        """, (id_playlist, id_musica))
-
-        existe = cursor.fetchone()
-
-        if existe:
-            print("Essa música já está nessa playlist.")
-        else:
-            cursor.execute("""
-            INSERT INTO playlist_musicas (id_playlist, id_musica)
-            VALUES (?, ?)
-            """, (id_playlist, id_musica))
-
-            conexao.commit()
-
-            print("Música adicionada à playlist!")
-    else:
-        print("Playlist ou música não encontrada.")
-
-
-def listar_musicas(cursor):
-    cursor.execute("SELECT * FROM musicas")
-    resultados = cursor.fetchall()
-
-    if resultados:
-        for musica in resultados:
-            print(f"ID: {musica[0]}")
-            print(f"Título: {musica[1]}")
-            print(f"Artista: {musica[2]}")
-            print(f"Álbum: {musica[3]}")
-            print(f"Gênero: {musica[4]}")
-            print()
-    else:
-        print("Nenhuma música cadastrada.")
-
-
-
-
+if __name__ == '__main__':
+    app.run(debug=True)

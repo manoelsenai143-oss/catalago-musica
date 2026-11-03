@@ -4,6 +4,19 @@ FROM "USUARIO";
 SELECT *
 FROM "ARTISTA";
 
+SELECT *
+FROM "ALBUM";
+
+select * FROM "MUSICA";
+
+select * FROM "GENERO";
+
+select * FROM "PLAYLIST";
+
+select * FROM "PLAYLIST_MUSICA";
+
+
+
 SELECT titulo, "duração"
 FROM "MUSICA"
 WHERE id_genero = 1;
