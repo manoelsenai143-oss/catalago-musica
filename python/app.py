@@ -111,7 +111,6 @@ def listar_musicas():
 
     return render_template("listar_musicas.html", musicas=resultados)
 
-
 # 5 - Buscar música
 @app.route('/musicas/buscar', methods=['GET'])
 def buscar_musica():
