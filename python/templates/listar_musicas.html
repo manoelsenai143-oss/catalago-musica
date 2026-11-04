@@ -3,11 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista de Músicas</title>
-    <style>
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-        th { background-color: #f4f4f4; }
-    </style>
 </head>
 <body>
     <h2>Catálogo de Músicas</h2>
@@ -17,18 +12,16 @@
             <th>ID</th>
             <th>Título</th>
             <th>Duração</th>
-            <th>Artista</th>
             <th>Álbum</th>
             <th>Gênero</th>
         </tr>
-        <!-- O Jinja percorre a lista 'musicas' enviada pelo app.py -->
         {% for musica in musicas %}
         <tr>
             <td>{{ musica.id }}</td>
             <td>{{ musica.titulo }}</td>
             <td>{{ musica.duracao }}</td>
-            <td>{{ musica.artista }}</td>
-            <td>{{ musica.album }}</td>
+            <!-- Se tiver álbum, mostra o nome. Se vier vazio (None), mostra 'Single' -->
+            <td>{{ musica.album if musica.album else 'Single (Sem Álbum)' }}</td>
             <td>{{ musica.genero }}</td>
         </tr>
         {% endfor %}

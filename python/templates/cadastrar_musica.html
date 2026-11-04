@@ -2,10 +2,18 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastrar Nova Música</title>
+    <title>Registar Nova Música</title>
 </head>
 <body>
     <h2>Registar Nova Música</h2>
+
+    <!-- Aviso humanizado caso ocorra erro com o ID do álbum -->
+    {% if erro %}
+        <div style="background-color: #ffdddd; color: #d8000c; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+            {{ erro }}
+        </div>
+    {% endif %}
+
     <form action="/musicas/novo" method="POST">
         <label>Título:</label><br>
         <input type="text" name="titulo" required><br><br>
@@ -13,14 +21,22 @@
         <label>Duração (segundos):</label><br>
         <input type="number" name="duracao" required><br><br>
 
+        <!-- Álbum digitado por ID (removido o 'required' para ficar opcional) -->
         <label>ID do Álbum:</label><br>
-        <input type="number" name="id_album" required><br><br>
+        <input type="number" name="id_album" placeholder="Ex: 1"><br><br>
 
-        <label>ID do Gênero:</label><br>
-        <input type="number" name="id_genero" required><br><br>
+        <!-- Gênero por Lista Suspensa -->
+        <label>Gênero:</label><br>
+        <select name="id_genero" required>
+            <option value="">Selecione um gênero</option>
+            {% for genero in generos %}
+                <option value="{{ genero[0] }}">{{ genero[1] }}</option>
+            {% endfor %}
+        </select><br><br>
 
         <button type="submit">Salvar Música</button>
     </form>
+
     <br>
     <a href="/musicas">Voltar para a lista</a>
 </body>

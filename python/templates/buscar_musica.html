@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo de Músicas</title>
+</head>
+<body>
+    <h2>Catálogo de Músicas</h2>
+
+    <!-- Barra de Pesquisa (Fica no topo) -->
+    <form action="/musicas/buscar" method="GET" class="form-busca">
+        <input type="text" name="titulo" placeholder="Pesquisar por título..." required>
+        <button type="submit">Buscar</button>
+        <a href="/musicas"><button type="button">Ver Todos</button></a>
+    </form>
+
+    <!-- Botão para Cadastrar Nova Música -->
+    <a href="/musicas/novo">
+        <button type="button" style="margin-bottom: 15px; padding: 8px 12px;">Cadastrar Nova Música</button>
+    </a>
+
+    <!-- Tabela de Listagem -->
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Duração</th>
+            <th>Artista</th>
+            <th>Álbum</th>
+            <th>Gênero</th>
+            <th>Ações</th>
+        </tr>
+        {% for musica in musicas %}
+        <tr>
+            <td>{{ musica.id }}</td>
+            <td>{{ musica.titulo }}</td>
+            <td>{{ musica.duracao }}</td>
+            <td>{{ musica.artista if musica.artista else 'N/A' }}</td>
+            <td>{{ musica.album if musica.album else 'Single (Sem Álbum)' }}</td>
+            <td>{{ musica.genero }}</td>
+            <td>
+                <div class="btn-grupo">
+                    <!-- Botão de Editar -->
+                    <a href="/musicas/editar/{{ musica.id }}">
+                        <button type="button">Editar</button>
+                    </a>
+
+                    <!-- Botão de Excluir atualizado com a mensagem de playlist -->
+                    <form action="/musicas/deletar/{{ musica.id }}" method="POST" style="display:inline;">
+                        <button type="submit" onclick="return confirm('Tem certeza de que deseja excluir esta música? ela pode estar dentro de uma playlist e fara com que seja excluida da playlist')">Excluir</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

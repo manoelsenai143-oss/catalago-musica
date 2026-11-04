@@ -64,12 +64,35 @@ def cadastrar_musica():
     if request.method == 'POST':
         titulo = request.form['titulo']
         duracao = request.form['duracao']
-        id_album = request.form['id_album']
+
+        # A forma curta e direta de tratar o campo do álbum
+        id_album_raw = request.form.get('id_album')
+        id_album = int(id_album_raw) if id_album_raw else None
+
         id_genero = request.form['id_genero']
 
         conexao = criar_conexao()
         cursor = conexao.cursor()
 
+        # Se o utilizador preencheu um álbum, verifica se ele realmente existe
+        if id_album is not None:
+            cursor.execute('SELECT id_album FROM "ALBUM" WHERE id_album = %s', (id_album,))
+            if not cursor.fetchone():
+                cursor.close()
+                conexao.close()
+
+                # Busca os géneros novamente para recarregar a página sem quebrar
+                conexao_gen = criar_conexao()
+                cursor_gen = conexao_gen.cursor()
+                cursor_gen.execute('SELECT id_genero, nome_genero FROM "GENERO"')
+                generos = cursor_gen.fetchall()
+                cursor_gen.close()
+                conexao_gen.close()
+
+                mensagem_erro = "Ops! O álbum com o ID informado não foi encontrado. Por favor, verifique o número ou deixe em branco."
+                return render_template("cadastrar_musica.html", generos=generos, erro=mensagem_erro)
+
+        # Se estiver tudo certo, guarda a música
         cursor.execute("""
             INSERT INTO "MUSICA" (titulo, "duração", id_album, id_genero)
             VALUES (%s, %s, %s, %s)
@@ -79,10 +102,17 @@ def cadastrar_musica():
         cursor.close()
         conexao.close()
 
-        # Redireciona de volta para a lista de músicas após cadastrar
         return redirect(url_for('listar_musicas'))
 
-    return render_template("cadastrar_musica.html")
+    # Parte do GET para carregar os géneros no <select>
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+    cursor.execute('SELECT id_genero, nome_genero FROM "GENERO"')
+    generos = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    return render_template("cadastrar_musica.html", generos=generos)
 
 # 4 - Listar músicas (com JOINs e RealDictCursor para retornar nomes legíveis)
 
@@ -92,18 +122,18 @@ def listar_musicas():
     conexao = criar_conexao()
     cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
+    # O LEFT JOIN no ALBUM permite que músicas sem álbum apareçam na lista
     cursor.execute("""
         SELECT 
             m.id_musica AS id,
             m.titulo,
             m."duração" AS duracao,
-            a.nome_artista AS artista,
             al.nome_album AS album,
             g.nome_genero AS genero
         FROM "MUSICA" m
-        JOIN "ALBUM" al ON m.id_album = al.id_album
-        JOIN "ARTISTA" a ON al.id_artista = a.id_artista
+        LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
         JOIN "GENERO" g ON m.id_genero = g.id_genero
+        ORDER BY m.id_musica ASC
     """)
     resultados = cursor.fetchall()
     cursor.close()
@@ -128,8 +158,8 @@ def buscar_musica():
             al.nome_album AS album,
             g.nome_genero AS genero
         FROM "MUSICA" m
-        JOIN "ALBUM" al ON m.id_album = al.id_album
-        JOIN "ARTISTA" a ON al.id_artista = a.id_artista
+        LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
+        LEFT JOIN "ARTISTA" a ON al.id_artista = a.id_artista
         JOIN "GENERO" g ON m.id_genero = g.id_genero
         WHERE m.titulo ILIKE %s
     """, (f"%{titulo}%",))
@@ -139,7 +169,7 @@ def buscar_musica():
     conexao.close()
 
     # Reutiliza o template de listagem para mostrar as músicas encontradas
-    return render_template("listar_musicas.html", musicas=resultados)
+    return render_template("buscar_musica.html", musicas=resultados)
 
 # 6 - Editar música
 @app.route('/musicas/editar/<int:id_musica>', methods=['GET', 'POST'])
@@ -173,11 +203,24 @@ def editar_musica(id_musica):
     return render_template("editar_musica.html", musica=musica)
 
 # 7 - Excluir música
-@app.route('/musicas/<int:id_musica>', methods=['DELETE'])
+@app.route('/musicas/deletar/<int:id_musica>', methods=['POST'])
 def excluir_musica(id_musica):
     conexao = criar_conexao()
     cursor = conexao.cursor()
 
+    cursor.execute("""
+        SELECT COUNT(*) FROM "PLAYLIST_MUSICA" WHERE id_musica = %s
+    """, (id_musica,))
+    total_playlists = cursor.fetchone()[0]
+
+    if total_playlists > 0:
+        print(f"Aviso: A música {id_musica} estava em {total_playlists} playlist(s) e foi removida delas.")
+
+    cursor.execute("""
+        DELETE FROM "PLAYLIST_MUSICA" WHERE id_musica = %s
+    """, (id_musica,))
+
+    # 3.  a música
     cursor.execute("""
         DELETE FROM "MUSICA" WHERE id_musica = %s
     """, (id_musica,))
@@ -186,7 +229,7 @@ def excluir_musica(id_musica):
     cursor.close()
     conexao.close()
 
-    return jsonify({"mensagem": "Música excluída com sucesso!"}), 200
+    return redirect(url_for('listar_musicas'))
 
 
 # 8 - Criar playlist
