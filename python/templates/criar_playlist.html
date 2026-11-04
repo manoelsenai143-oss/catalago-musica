@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Playlist</title>
+</head>
+<body>
+    <h2>Criar Nova Playlist</h2>
+
+    <form action="/playlists/novo" method="POST">
+        <label>Nome da Playlist:</label><br>
+        <input type="text" name="nome_playlist" required><br><br>
+
+        <label>ID do Utilizador:</label><br>
+        <input type="number" name="id_usuario" required><br><br>
+
+        <button type="submit">Salvar Playlist</button>
+    </form>
+
+    <br>
+    <a href="/musicas">Voltar para o Catálogo</a>
+</body>
+</html>

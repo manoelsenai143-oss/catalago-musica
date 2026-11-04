@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Adicionar Música à Playlist</title>
+</head>
+<body>
+    <h2>Adicionar Música à Playlist</h2>
+
+    <form action="/playlists/adicionar-musica" method="POST">
+        <label>Selecione a Playlist:</label><br>
+        <select name="id_playlist" required>
+            <option value="">Escolha a playlist...</option>
+            {% for playlist in playlists %}
+                <option value="{{ playlist.id_playlist }}">{{ playlist.nome_playlist }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label>Selecione a Música:</label><br>
+        <select name="id_musica" required>
+            <option value="">Escolha a música...</option>
+            {% for musica in musicas %}
+                <option value="{{ musica.id_musica }}">{{ musica.titulo }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <button type="submit">Adicionar Música</button>
+    </form>
+
+    <br>
+    <a href="/playlists">
+        <button type="button">Ver Listagem de Playlists</button>
+    </a>
+    <br><br>
+    <a href="/musicas">Voltar para o Catálogo</a>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Utilizador</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background-color: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+    <div style="background-color: #181818; padding: 40px; border-radius: 10px; width: 350px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+        <h2 style="color: #1db954; margin-bottom: 20px;">👤 Login de Utilizador</h2>
+
+        <!-- Mensagem de Erro -->
+        {% if erro %}
+            <p style="color: #e74c3c; background-color: rgba(231, 76, 60, 0.1); padding: 10px; border-radius: 5px; text-align: center; font-size: 0.9rem; margin-bottom: 15px;">{{ erro }}</p>
+        {% endif %}
+
+        <form action="/login/usuario" method="POST">
+            <label style="display: block; margin-bottom: 5px;">Email:</label>
+            <input type="email" name="email" required style="width: 100%; padding: 10px; margin-bottom: 15px; background: #333; border: none; color: #fff; border-radius: 5px;">
+
+            <label style="display: block; margin-bottom: 5px;">Senha:</label>
+            <input type="password" name="senha" required style="width: 100%; padding: 10px; margin-bottom: 20px; background: #333; border: none; color: #fff; border-radius: 5px;">
+
+            <button type="submit" style="width: 100%; padding: 10px; background-color: #1db954; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Entrar</button>
+        </form>
+
+        <p style="margin-top: 15px; text-align: center;">
+            <a href="/cadastrar_usuario" style="color: #1db954; text-decoration: none; font-size: 0.9rem;">Não tem conta? Registe-se</a>
+        </p>
+
+        <p style="margin-top: 10px; text-align: center;">
+            <a href="/" style="color: #b3b3b3; text-decoration: none; font-size: 0.9rem;">← Voltar ao Início</a>
+        </p>
+    </div>
+</body>
+</html>

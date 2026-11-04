@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Músico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background-color: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+    <div style="background-color: #181818; padding: 40px; border-radius: 10px; width: 350px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+        <h2 style="color: #f39c12; margin-bottom: 20px;">🎸 Área do Músico</h2>
+        <form action="/login/musico" method="POST">
+            <label style="display: block; margin-bottom: 5px;">CPF:</label>
+            <input type="text" name="cpf" placeholder="000.000.000-00" required style="width: 100%; padding: 10px; margin-bottom: 15px; background: #333; border: none; color: #fff; border-radius: 5px;">
+
+            <label style="display: block; margin-bottom: 5px;">Senha:</label>
+            <input type="password" name="senha" required style="width: 100%; padding: 10px; margin-bottom: 20px; background: #333; border: none; color: #fff; border-radius: 5px;">
+
+            <button type="submit" style="width: 100%; padding: 10px; background-color: #f39c12; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Entrar como Músico</button>
+        </form>
+        <p style="margin-top: 15px; text-align: center;"><a href="/" style="color: #b3b3b3; text-decoration: none;">← Voltar ao Início</a></p>
+    </div>
+</body>
+</html>

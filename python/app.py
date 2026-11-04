@@ -5,10 +5,48 @@ from database import criar_conexao
 
 app = Flask(__name__)
 
+@app.route('/')
+def pagina_escolha_login():
+    return render_template('login.html')
 
+@app.route('/login/admin')
+def login_admin_page():
+    return render_template('login_admin.html')
+
+@app.route('/login/musico')
+def login_musico_page():
+    return render_template('login_musico.html')
+
+
+@app.route('/login/usuario', methods=['GET', 'POST'])
+def login_usuario():
+    erro = None
+    if request.method == 'POST':
+        email = request.form['email']
+        senha = request.form['senha']
+
+        conexao = criar_conexao()
+        cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+        cursor.execute("""
+            SELECT id, nome_usuario, email
+            FROM "USUARIO"
+            WHERE email = %s AND senha = %s
+        """, (email, senha))
+
+        usuario = cursor.fetchone()
+        cursor.close()
+        conexao.close()
+
+        if usuario:
+            return redirect(url_for('usuario_home'))
+        else:
+            erro = "Email ou senha incorretos."
+
+    return render_template('login_usuario.html', erro=erro)
 
 # 1 - Cadastrar usuário
-@app.route('/usuarios', methods=['GET', 'POST'])
+@app.route('/cadastrar_usuario', methods=['GET', 'POST'])
 def cadastrar_usuario():
     if request.method == 'POST':
         nome = request.form['nome_usuario']
@@ -25,38 +63,17 @@ def cadastrar_usuario():
         cursor.close()
         conexao.close()
 
-        # Após cadastrar com sucesso, redireciona para a página de login
-        return redirect(url_for('fazer_login'))
+        return redirect(url_for('login_usuario'))
 
     return render_template("cadastrar_usuario.html")
 
 
 # Rota de Login (GET mostra o formulário, POST valida no banco)
-@app.route('/login', methods=['GET', 'POST'])
-def fazer_login():
-    erro = None
-    if request.method == 'POST':
-        email = request.form['email']
-        senha = request.form['senha']
 
-        conexao = criar_conexao()
-        cursor = conexao.cursor(cursor_factory=RealDictCursor)
-        cursor.execute("""
-            SELECT id, nome_usuario
-            FROM "USUARIO"
-            WHERE email = %s AND senha = %s
-        """, (email, senha))
-        usuario = cursor.fetchone()
-        cursor.close()
-        conexao.close()
-
-        if usuario:
-            # Login bem-sucedido, redireciona para a listagem de músicas
-            return redirect(url_for('listar_musicas'))
-        else:
-            erro = "Email ou senha incorretos."
-
-    return render_template("login.html", erro=erro)
+@app.route('/usuario/home')
+def usuario_home():
+    # Aqui pode depois verificar se o utilizador está logado, se necessário
+    return render_template('usuario_home.html')
 
 # 3 - Cadastrar música
 @app.route('/musicas/novo', methods=['GET', 'POST'])
@@ -233,31 +250,28 @@ def excluir_musica(id_musica):
 
 
 # 8 - Criar playlist
-@app.route('/playlists', methods=['POST'])
+@app.route('/playlists/novo', methods=['GET', 'POST'])
 def criar_playlist():
-    dados = request.get_json()
-    nome_playlist = dados.get('nome_playlist')
-    id_usuario = dados.get('id_usuario')
+    if request.method == 'POST':
+        nome_playlist = request.form['nome_playlist']
+        id_usuario = request.form['id_usuario']
 
-    if not id_usuario:
-        return jsonify({"erro": "ID do usuário é obrigatório."}), 400
+        conexao = criar_conexao()
+        cursor = conexao.cursor()
 
-    conexao = criar_conexao()
-    cursor = conexao.cursor()
+        cursor.execute("""
+            INSERT INTO "PLAYLIST" (nome_playlist, id_usuario)
+            VALUES (%s, %s)
+        """, (nome_playlist, id_usuario))
 
-    cursor.execute("""
-        INSERT INTO "PLAYLIST" (nome_playlist, id_usuario)
-        VALUES (%s, %s)
-        RETURNING id_playlist;
-    """, (nome_playlist, id_usuario))
+        conexao.commit()
+        cursor.close()
+        conexao.close()
 
-    novo_id = cursor.fetchone()[0]
-    conexao.commit()
-    cursor.close()
-    conexao.close()
+        # Alterado para redirecionar para a lista de playlists
+        return redirect(url_for('listar_playlists'))
 
-    return jsonify({"mensagem": "Playlist criada com sucesso!", "id_playlist": novo_id}), 201
-
+    return render_template("criar_playlist.html")
 
 # 9 - Listar playlists
 @app.route('/playlists', methods=['GET'])
@@ -265,38 +279,61 @@ def listar_playlists():
     conexao = criar_conexao()
     cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
+    # Usamos o LEFT JOIN para trazer as músicas e o STRING_AGG para agrupá-las
     cursor.execute("""
-        SELECT p.id_playlist, p.nome_playlist, u.nome_usuario 
+        SELECT 
+            p.id_playlist, 
+            p.nome_playlist, 
+            u.nome_usuario,
+            STRING_AGG(m.titulo, ', ') AS musicas
         FROM "PLAYLIST" p
         JOIN "USUARIO" u ON p.id_usuario = u.id
+        JOIN "PLAYLIST_MUSICA" pm ON p.id_playlist = pm.id_playlist
+        JOIN "MUSICA" m ON pm.id_musica = m.id_musica
+        GROUP BY p.id_playlist, p.nome_playlist, u.nome_usuario
+        ORDER BY p.id_playlist ASC
     """)
     resultados = cursor.fetchall()
     cursor.close()
     conexao.close()
 
-    return jsonify(resultados), 200
+    return render_template("listar_playlists.html", playlists=resultados)
 
 
 # 10 - Adicionar música à playlist
-@app.route('/playlists/adicionar-musica', methods=['POST'])
+@app.route('/playlists/adicionar-musica', methods=['GET', 'POST'])
 def adicionar_musica_playlist():
-    dados = request.get_json()
-    id_playlist = dados.get('id_playlist')
-    id_musica = dados.get('id_musica')
-
     conexao = criar_conexao()
-    cursor = conexao.cursor()
 
-    cursor.execute("""
-        INSERT INTO "PLAYLIST_MUSICA" (id_playlist, id_musica)
-        VALUES (%s, %s)
-    """, (id_playlist, id_musica))
+    if request.method == 'POST':
+        id_playlist = request.form.get('id_playlist')
+        id_musica = request.form.get('id_musica')
 
-    conexao.commit()
+        cursor = conexao.cursor()
+        cursor.execute("""
+            INSERT INTO "PLAYLIST_MUSICA" (id_playlist, id_musica)
+            VALUES (%s, %s)
+        """, (id_playlist, id_musica))
+
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+
+        return redirect(url_for('listar_playlists'))
+
+    # GET: Busca as playlists e as músicas para preencher os menus <select>
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute('SELECT id_playlist, nome_playlist FROM "PLAYLIST"')
+    playlists = cursor.fetchall()
+
+    cursor.execute('SELECT id_musica, titulo FROM "MUSICA"')
+    musicas = cursor.fetchall()
+
     cursor.close()
     conexao.close()
 
-    return jsonify({"mensagem": "Música adicionada à playlist com sucesso!"}), 201
+    return render_template("adicionar_musica_playlist.html", playlists=playlists, musicas=musicas)
 
 
 if __name__ == '__main__':

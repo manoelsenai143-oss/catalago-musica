@@ -2,26 +2,23 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Catálogo de Música</title>
+    <title>Escolher Tipo de Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <h2>Fazer Login</h2>
+<body style="background-color: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+    <div style="background-color: #181818; padding: 40px; border-radius: 10px; width: 380px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+        <h2 style="margin-bottom: 25px; color: #fff;">Escolha o seu Perfil</h2>
 
-    <!-- Se houver erro de login, mostra a mensagem na tela -->
-    {% if erro %}
-        <p style="color: red;">{{ erro }}</p>
-    {% endif %}
+        <!-- Botão Admin -->
+        <a href="/login/admin" style="display: block; width: 100%; padding: 12px; margin-bottom: 12px; background-color: #e74c3c; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">🛡️ Administrador</a>
 
-    <form action="/login" method="POST">
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
+        <!-- Botão Músico -->
+        <a href="/login/musico" style="display: block; width: 100%; padding: 12px; margin-bottom: 12px; background-color: #f39c12; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">🎸 Músico (CPF)</a>
 
-        <label>Senha:</label><br>
-        <input type="password" name="senha" required><br><br>
+        <!-- Botão Utilizador -->
+        <a href="/login/usuario" style="display: block; width: 100%; padding: 12px; margin-bottom: 20px; background-color: #1db954; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">👤 Utilizador</a>
 
-        <button type="submit">Entrar</button>
-    </form>
-    <br>
-    <a href="/usuarios">Não tem conta? Registe-se</a>
+        <p><a href="/" style="color: #b3b3b3; text-decoration: none; font-size: 0.9rem;">← Voltar ao Início</a></p>
+    </div>
 </body>
 </html>

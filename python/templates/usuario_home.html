@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Utilizador</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Menu Lateral -->
+    <div class="menu-lateral">
+        <h2>🎵 Sistema</h2>
+        <nav>
+            <a href="/usuario/home" class="ativo">🏠 Início</a>
+            <a href="/musicas">🎵 Músicas</a>
+            <a href="/playlists">📑 Playlists</a>
+        </nav>
+
+        <div style="margin-top: auto;">
+            <a href="/login" style="color: #e74c3c; font-size: 0.9rem; text-decoration: none;">🚪 Terminar Sessão</a>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="conteudo-principal">
+        <header style="margin-bottom: 30px;">
+            <h1>Bem-vindo ao seu Painel!</h1>
+            <p style="color: #b3b3b3;">Gerencie as suas músicas e playlists favoritas por aqui.</p>
+        </header>
+
+        <div class="cards-grid">
+            <div class="card card-verde">
+                <h3 style="margin: 0 0 10px 0; font-size: 1rem; color: #b3b3b3;">As suas Playlists</h3>
+                <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">0</p>
+            </div>
+
+            <div class="card card-laranja">
+                <h3 style="margin: 0 0 10px 0; font-size: 1rem; color: #b3b3b3;">Músicas Favoritas</h3>
+                <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">0</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

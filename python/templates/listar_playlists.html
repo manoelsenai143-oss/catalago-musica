@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Playlists</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Playlists Cadastradas</h2>
+
+    <!-- Botões de navegação -->
+    <a href="/playlists/novo">
+        <button type="button" style="margin-bottom: 15px; padding: 8px 12px;">Criar Nova Playlist</button>
+    </a>
+    <a href="/musicas">
+        <button type="button" style="margin-bottom: 15px; padding: 8px 12px;">Voltar para o Catálogo</button>
+    </a>
+
+    <!-- Tabela de Listagem -->
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>ID</th>
+            <th>Nome da Playlist</th>
+            <th>Usuário</th>
+            <th>Músicas</th>
+        </tr>
+        {% for playlist in playlists %}
+        <tr>
+            <td>{{ playlist.id_playlist }}</td>
+            <td>{{ playlist.nome_playlist }}</td>
+            <td>{{ playlist.nome_usuario }}</td>
+            <td>
+                <!-- Se houver músicas exibe, senão mostra um aviso -->
+                {{ playlist.musicas if playlist.musicas else 'Nenhuma música adicionada' }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo Musical - Tudo Junto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- BARRA LATERAL (MENU) -->
+    <aside class="sidebar">
+        <h2>Library</h2>
+        <nav>
+            <a href="/">🏠 Inicio</a>
+            <a href="/musicas">🎵 Músicas</a>
+            <a href="/playlists">📑 Playlists</a>
+            <a href="/playlists/novo">➕ Criar Playlist</a>
+            <a href="/playlists/adicionar-musica">🔗 Add Música</a>
+
+            <a href="/login" style="margin-top: 20px; color: #1db954;">👤 Entrar</a>
+
+        </nav>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL (DASHBOARD) NO MESMO FICHEIRO -->
+    <main class="main-content">
+        <div class="header-title">
+            <h1>Browse</h1>
+        </div>
+
+        <!-- Banner de Destaque -->
+        <div style="background: linear-gradient(90deg, #d35400, #e67e22); padding: 30px; border-radius: 15px; margin-bottom: 30px;">
+            <small style="text-transform: uppercase;">Curated Playlist</small>
+            <h2 style="font-size: 2.5rem; margin: 10px 0;">BLINDING LIGHTS</h2>
+            <p>Aproveite as melhores faixas do seu catálogo musical.</p>
+        </div>
+
+        <!-- Playlists Populares -->
+        <h3>Playlists Populares</h3>
+        <div style="display: flex; gap: 15px; margin: 20px 0;">
+            <div style="background-color: #1e1e24; padding: 15px; border-radius: 10px; width: 150px; text-align: center;">
+                <div style="width: 80px; height: 80px; background-color: #333; border-radius: 50%; margin: 0 auto 10px auto;"></div>
+                <strong>Para estudar</strong>
+            </div>
+            <div style="background-color: #1e1e24; padding: 15px; border-radius: 10px; width: 150px; text-align: center;">
+                <div style="width: 80px; height: 80px; background-color: #333; border-radius: 50%; margin: 0 auto 10px auto;"></div>
+                <strong>Rock</strong>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

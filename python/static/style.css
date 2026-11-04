@@ -1,0 +1,68 @@
+/* Estilos Globais */
+body {
+    background-color: #121212;
+    color: #fff;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+}
+
+/* Menu Lateral */
+.menu-lateral {
+    width: 250px;
+    background-color: #181818;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #282828;
+}
+
+.menu-lateral h2 {
+    color: #1db954;
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+.menu-lateral nav {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.menu-lateral nav a {
+    color: #b3b3b3;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.menu-lateral nav a.ativo, .menu-lateral nav a:hover {
+    color: #fff;
+}
+
+/* Conteúdo Principal / Dashboard */
+.conteudo-principal {
+    flex-grow: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background-color: #181818;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.card-verde {
+    border-left: 4px solid #1db954;
+}
+
+.card-laranja {
+    border-left: 4px solid #f39c12;
+}
