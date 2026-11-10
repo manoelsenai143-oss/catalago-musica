@@ -69,15 +69,6 @@
                     <td style="padding: 15px; color: #b3b3b3;">{{ musica.genero }}</td>
                     <td style="padding: 15px; text-align: center;">
                         <div style="display: flex; gap: 8px; justify-content: center;">
-                            <!-- Botão Editar -->
-                            <a href="{{ url_for('musico_editar_musica', musico_id=musico_id, id_musica=musica.id) }}">
-                                <button type="button" style="padding: 6px 12px; background-color: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Editar</button>
-                            </a>
-
-                            <!-- Botão Excluir -->
-                            <form action="{{ url_for('musico_excluir_musica', musico_id=musico_id, id_musica=musica.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" onclick="return confirm('Tem certeza de que deseja excluir esta música? Ela será removida de playlists associadas.')" style="padding: 6px 12px; background-color: #e74c3c; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Excluir</button>
-                            </form>
                         </div>
                     </td>
                 </tr>
