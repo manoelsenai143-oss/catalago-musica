@@ -130,13 +130,12 @@ def musico_cadastrar_musica(musico_id):
 
         return redirect(url_for('musico_listar_musicas', musico_id=musico_id))
 
-    # GET: Carrega os géneros e os álbuns do músico
-    cursor = conexao.cursor()
+    # GET: Usa o RealDictCursor para retornar dicionários organizados
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
     cursor.execute('SELECT id_genero, nome_genero FROM "GENERO"')
     generos = cursor.fetchall()
 
-    # Busca apenas os álbuns deste músico específico
     cursor.execute('SELECT id_album, nome_album FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
     albuns = cursor.fetchall()
 
@@ -144,7 +143,6 @@ def musico_cadastrar_musica(musico_id):
     conexao.close()
 
     return render_template("cadastrar_musica.html", generos=generos, albuns=albuns, musico_id=musico_id)
-
 
 # Rota de playlists do músico ajustada para receber o musico_id e ter o nome exato esperado pelo HTML
 @app.route('/musico/playlists/<int:musico_id>', methods=['GET'])

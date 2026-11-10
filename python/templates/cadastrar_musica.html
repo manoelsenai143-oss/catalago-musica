@@ -2,42 +2,56 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Registar Nova Música</title>
+    <title>Cadastrar Música</title>
 </head>
-<body>
-    <h2>Registar Nova Música</h2>
+<body style="background-color: #121212; color: #fff; margin: 0; font-family: sans-serif; display: flex; height: 100vh; justify-content: center; align-items: center;">
 
-    <!-- Aviso humanizado caso ocorra erro com o ID do álbum -->
-    {% if erro %}
-        <div style="background-color: #ffdddd; color: #d8000c; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
-            {{ erro }}
+    <div style="background-color: #181818; padding: 30px; border-radius: 8px; width: 420px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 1px solid #282828;">
+
+        <h2 style="margin-top: 0; color: #1db954; font-size: 1.5rem; margin-bottom: 20px;">🎶 Cadastrar Nova Música</h2>
+
+        <form action="{{ url_for('musico_cadastrar_musica', musico_id=musico_id) }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+
+            <div>
+                <label style="display: block; margin-bottom: 5px; color: #b3b3b3; font-size: 0.9rem;">Título da Música:</label>
+                <input type="text" name="titulo" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #333; background: #222; color: #fff; box-sizing: border-box;">
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 5px; color: #b3b3b3; font-size: 0.9rem;">Duração (em segundos):</label>
+                <input type="number" name="duracao" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #333; background: #222; color: #fff; box-sizing: border-box;">
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 5px; color: #b3b3b3; font-size: 0.9rem;">Álbum (Opcional):</label>
+                <select name="id_album" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #333; background: #222; color: #fff; box-sizing: border-box;">
+                    <option value="">Nenhum (Single / Avulso)</option>
+                    {% for album in albuns %}
+                        <option value="{{ album.id_album }}">{{ album.nome_album }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label style="display: block; margin-bottom: 5px; color: #b3b3b3; font-size: 0.9rem;">Género:</label>
+                <select name="id_genero" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #333; background: #222; color: #fff; box-sizing: border-box;">
+                    <option value="">Selecione um género</option>
+                    {% for genero in generos %}
+                        <option value="{{ genero.id_genero }}">{{ genero.nome_genero }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" style="padding: 12px; background-color: #1db954; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px;">
+                Guardar Música
+            </button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="{{ url_for('musico_home', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-size: 0.9rem;">← Voltar ao Início</a>
         </div>
-    {% endif %}
 
-    <form action="/musicas/novo" method="POST">
-        <label>Título:</label><br>
-        <input type="text" name="titulo" required><br><br>
+    </div>
 
-        <label>Duração (segundos):</label><br>
-        <input type="number" name="duracao" required><br><br>
-
-        <!-- Álbum digitado por ID (removido o 'required' para ficar opcional) -->
-        <label>ID do Álbum:</label><br>
-        <input type="number" name="id_album" placeholder="Ex: 1"><br><br>
-
-        <!-- Gênero por Lista Suspensa -->
-        <label>Gênero:</label><br>
-        <select name="id_genero" required>
-            <option value="">Selecione um gênero</option>
-            {% for genero in generos %}
-                <option value="{{ genero[0] }}">{{ genero[1] }}</option>
-            {% endfor %}
-        </select><br><br>
-
-        <button type="submit">Salvar Música</button>
-    </form>
-
-    <br>
-    <a href="/musicas">Voltar para a lista</a>
 </body>
 </html>
