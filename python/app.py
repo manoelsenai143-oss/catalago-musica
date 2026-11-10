@@ -9,13 +9,209 @@ app = Flask(__name__)
 def pagina_escolha_login():
     return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    return redirect('/')
+
 @app.route('/login/admin')
 def login_admin_page():
     return render_template('login_admin.html')
 
-@app.route('/login/musico')
-def login_musico_page():
-    return render_template('login_musico.html')
+@app.route('/login/musico', methods=['GET', 'POST'])
+def login_musico():
+    erro = None
+    if request.method == 'POST':
+        cpf = request.form['cpf']
+        senha = request.form['senha']
+
+        conexao = criar_conexao()
+        cursor = conexao.cursor(cursor_factory=RealDictCursor)
+        cursor.execute("""
+            SELECT id, nome
+            FROM musicos
+            WHERE cpf = %s AND senha = %s
+        """, (cpf, senha))
+        musico = cursor.fetchone()
+        cursor.close()
+        conexao.close()
+
+        if musico:
+            # Redireciona para a home do músico passando o ID diretamente na URL (sem session)
+            return redirect(url_for('musico_home', musico_id=musico['id']))
+        else:
+            erro = "CPF ou senha incorretos."
+
+    return render_template('login_musico.html', erro=erro)
+
+@app.route('/cadastrar_musico', methods=['GET', 'POST'])
+def cadastrar_musico():
+    erro = None
+    if request.method == 'POST':
+        nome = request.form['nome']
+        cpf = request.form['cpf']
+        senha = request.form['senha']
+
+        conexao = criar_conexao()
+        cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+        cursor.execute('SELECT id FROM musicos WHERE cpf = %s', (cpf,))
+        musico_existente = cursor.fetchone()
+
+        if musico_existente:
+            erro = "Este CPF já está cadastrado."
+            cursor.close()
+            conexao.close()
+        else:
+            cursor.execute("""
+                INSERT INTO musicos (nome, cpf, senha)
+                VALUES (%s, %s, %s)
+            """, (nome, cpf, senha))
+
+            conexao.commit()
+            cursor.close()
+            conexao.close()
+
+            return redirect(url_for('login_musico'))
+
+    return render_template("cadastrar_musico.html", erro=erro)
+
+@app.route('/musico/home/<int:musico_id>', methods=['GET', 'POST'])
+def musico_home(musico_id):
+    return render_template('musico_home.html', musico_id=musico_id)
+
+
+@app.route('/musico/musicas/<int:musico_id>', methods=['GET'])
+def musico_listar_musicas(musico_id):
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute("""
+        SELECT 
+            m.id_musica AS id,
+            m.titulo,
+            m."duração" AS duracao,
+            al.nome_album AS album,
+            g.nome_genero AS genero
+        FROM "MUSICA" m
+        LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
+        JOIN "GENERO" g ON m.id_genero = g.id_genero
+        WHERE al.id_artista = %s
+        ORDER BY m.id_musica ASC
+    """, (musico_id,))
+
+    musicas = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    # Corrigido para chamar o template correto que criamos
+    return render_template('musico_listar.html', musicas=musicas, musico_id=musico_id)
+
+
+@app.route('/musico/musicas/novo/<int:musico_id>', methods=['GET', 'POST'])
+def musico_cadastrar_musica(musico_id):
+    conexao = criar_conexao()
+
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        duracao = request.form['duracao']
+        id_album_raw = request.form.get('id_album')
+        id_album = int(id_album_raw) if id_album_raw else None
+        id_genero = request.form['id_genero']
+
+        cursor = conexao.cursor()
+        cursor.execute("""
+            INSERT INTO "MUSICA" (titulo, "duração", id_album, id_genero)
+            VALUES (%s, %s, %s, %s)
+        """, (titulo, duracao, id_album, id_genero))
+
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+
+        return redirect(url_for('musico_listar_musicas', musico_id=musico_id))
+
+    # GET: Carrega os géneros e os álbuns do músico
+    cursor = conexao.cursor()
+
+    cursor.execute('SELECT id_genero, nome_genero FROM "GENERO"')
+    generos = cursor.fetchall()
+
+    # Busca apenas os álbuns deste músico específico
+    cursor.execute('SELECT id_album, nome_album FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
+    albuns = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    return render_template("cadastrar_musica.html", generos=generos, albuns=albuns, musico_id=musico_id)
+
+
+# Rota de playlists do músico ajustada para receber o musico_id e ter o nome exato esperado pelo HTML
+@app.route('/musico/playlists/<int:musico_id>', methods=['GET'])
+def musico_listar_playlists(musico_id):
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    # Mantemos o LEFT JOIN para garantir que as playlists aparecem mesmo sem músicas
+    cursor.execute("""
+        SELECT 
+            p.id_playlist, 
+            p.nome_playlist, 
+            u.nome_usuario,
+            STRING_AGG(m.titulo, ', ') AS musicas
+        FROM "PLAYLIST" p
+        JOIN "USUARIO" u ON p.id_usuario = u.id
+        LEFT JOIN "PLAYLIST_MUSICA" pm ON p.id_playlist = pm.id_playlist
+        LEFT JOIN "MUSICA" m ON pm.id_musica = m.id_musica
+        GROUP BY p.id_playlist, p.nome_playlist, u.nome_usuario
+        ORDER BY p.id_playlist ASC
+    """)
+    playlists = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    return render_template('listar_playlist.html', playlists=playlists, musico_id=musico_id)
+
+
+# Rota para o Músico visualizar apenas os seus próprios álbuns
+@app.route('/musico/albuns/<int:musico_id>', methods=['GET'])
+def musico_listar_albuns(musico_id):
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    # Filtra apenas os álbuns do artista logado
+    cursor.execute('SELECT id_album, nome_album FROM "ALBUM" WHERE id_artista = %s ORDER BY id_album ASC', (musico_id,))
+    albuns = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    return render_template('musico_listar_albuns.html', albuns=albuns, musico_id=musico_id)
+
+
+# Rota para o Músico criar um novo álbum
+@app.route('/musico/albuns/novo/<int:musico_id>', methods=['GET', 'POST'])
+def musico_cadastrar_album(musico_id):
+    if request.method == 'POST':
+        nome_album = request.form['nome_album']
+        ano_album = request.form['ano_album']
+
+        conexao = criar_conexao()
+        cursor = conexao.cursor()
+
+        cursor.execute("""
+            INSERT INTO "ALBUM" (nome_album, ano_album, id_artista)
+            VALUES (%s, %s, %s)
+        """, (nome_album, ano_album, musico_id))
+
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+
+        # Redireciona para a home após cadastrar com sucesso
+        return redirect(url_for('musico_home', musico_id=musico_id))
+
+    return render_template("musico_cadastrar_album.html", musico_id=musico_id)
 
 
 @app.route('/login/usuario', methods=['GET', 'POST'])
@@ -44,6 +240,7 @@ def login_usuario():
             erro = "Email ou senha incorretos."
 
     return render_template('login_usuario.html', erro=erro)
+
 
 # 1 - Cadastrar usuário
 @app.route('/cadastrar_usuario', methods=['GET', 'POST'])
@@ -156,7 +353,7 @@ def listar_musicas():
     cursor.close()
     conexao.close()
 
-    return render_template("listar_musicas.html", musicas=resultados)
+    return render_template("buscar_musica.html", musicas=resultados)
 
 # 5 - Buscar música
 @app.route('/musicas/buscar', methods=['GET'])

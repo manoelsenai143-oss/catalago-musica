@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>As Minhas Músicas - Painel do Músico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background-color: #121212; color: #fff; margin: 0; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden;">
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <div style="width: 240px; background-color: #000; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; border-right: 1px solid #222;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px; color: #1db954; font-weight: bold; font-size: 1.2rem;">
+                🎵 Sistema
+            </div>
+
+            <nav style="display: flex; flex-direction: column; gap: 15px;">
+                <a href="{{ url_for('musico_home', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    🏠 Início
+                </a>
+                <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}" style="color: #fff; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    🎶 Músicas
+                </a>
+                <a href="{{ url_for('musico_listar_playlists', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    📄 Playlists
+                </a>
+                <a href="{{ url_for('musico_cadastrar_musica', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    ➕ Cadastrar Música
+                </a>
+            </nav>
+        </div>
+
+        <div>
+            <a href="{{ url_for('logout') }}" style="color: #e74c3c; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                🚪 Terminar Sessão
+            </a>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div style="flex: 1; padding: 40px; overflow-y: auto; background-color: #121212;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h1 style="font-size: 2rem; margin: 0; color: #fff;">🎶 As Minhas Músicas</h1>
+            <a href="{{ url_for('musico_cadastrar_musica', musico_id=musico_id) }}">
+                <button type="button" style="padding: 10px 15px; background-color: #1db954; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">+ Nova Música</button>
+            </a>
+        </div>
+
+        <!-- Tabela de Músicas -->
+        <table style="width: 100%; border-collapse: collapse; text-align: left; background-color: #181818; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+            <thead>
+                <tr style="border-bottom: 1px solid #333; color: #b3b3b3; background-color: #222;">
+                    <th style="padding: 15px;">ID</th>
+                    <th style="padding: 15px;">Título</th>
+                    <th style="padding: 15px;">Duração</th>
+                    <th style="padding: 15px;">Álbum</th>
+                    <th style="padding: 15px;">Gênero</th>
+                    <th style="padding: 15px; text-align: center;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for musica in musicas %}
+                <tr style="border-bottom: 1px solid #222;">
+                    <td style="padding: 15px;">{{ musica.id }}</td>
+                    <td style="padding: 15px; font-weight: bold; color: #fff;">{{ musica.titulo }}</td>
+                    <td style="padding: 15px; color: #b3b3b3;">{{ musica.duracao }}</td>
+                    <td style="padding: 15px; color: #b3b3b3;">{{ musica.album if musica.album else 'Single (Sem Álbum)' }}</td>
+                    <td style="padding: 15px; color: #b3b3b3;">{{ musica.genero }}</td>
+                    <td style="padding: 15px; text-align: center;">
+                        <div style="display: flex; gap: 8px; justify-content: center;">
+                            <!-- Botão Editar -->
+                            <a href="{{ url_for('musico_editar_musica', musico_id=musico_id, id_musica=musica.id) }}">
+                                <button type="button" style="padding: 6px 12px; background-color: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Editar</button>
+                            </a>
+
+                            <!-- Botão Excluir -->
+                            <form action="{{ url_for('musico_excluir_musica', musico_id=musico_id, id_musica=musica.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" onclick="return confirm('Tem certeza de que deseja excluir esta música? Ela será removida de playlists associadas.')" style="padding: 6px 12px; background-color: #e74c3c; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="padding: 30px; text-align: center; color: #777;">Ainda não tem músicas cadastradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+</html>

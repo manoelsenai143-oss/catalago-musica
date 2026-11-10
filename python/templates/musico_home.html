@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Músico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background-color: #121212; color: #fff; margin: 0; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden;">
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <div style="width: 240px; background-color: #000; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; border-right: 1px solid #222;">
+
+        <div>
+            <!-- Título do Sistema -->
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px; color: #1db954; font-weight: bold; font-size: 1.2rem;">
+                🎵 Sistema
+            </div>
+
+            <!-- Links de Navegação -->
+            <nav style="display: flex; flex-direction: column; gap: 15px;">
+                <a href="{{ url_for('musico_home', musico_id=musico_id) }}" style="color: #fff; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    🏠 Início
+                </a>
+                <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    🎶 Músicas
+                </a>
+                <!-- ADICIONADO: Link para Álbuns -->
+                <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    💿 Álbuns
+                </a>
+                <a href="{{ url_for('musico_listar_playlists', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    📄 Playlists
+                </a>
+                <a href="{{ url_for('musico_cadastrar_musica', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    ➕ Cadastrar Música
+                </a>
+            </nav>
+        </div>
+
+        <!-- Botão de Sair / Terminar Sessão -->
+        <div>
+            <a href="{{ url_for('logout') }}" style="color: #e74c3c; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                🚪 Terminar Sessão
+            </a>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div style="flex: 1; padding: 40px; overflow-y: auto; background-color: #121212;">
+
+        <h1 style="font-size: 2rem; margin-bottom: 10px; color: #fff;">Bem-vindo ao seu Painel!</h1>
+        <p style="color: #b3b3b3; margin-bottom: 30px;">Gerencie as suas músicas, álbuns e playlists favoritas por aqui[cite: 1].</p>
+
+        <!-- Cartões de Resumo -->
+        <div style="display: flex; gap: 20px;">
+
+            <!-- Cartão Playlists -->
+            <div style="background-color: #181818; border-radius: 8px; padding: 20px; width: 250px; border-left: 4px solid #1db954; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                <p style="color: #b3b3b3; margin: 0 0 10px 0; font-size: 0.9rem;">As suas Playlists</p>
+                <h2 style="margin: 0; font-size: 2rem; color: #fff;">
+                    <a href="{{ url_for('musico_listar_playlists', musico_id=musico_id) }}" style="color: #fff; text-decoration: none;">Ver</a>
+                </h2>
+            </div>
+
+            <!-- ADICIONADO: Cartão de Álbuns -->
+            <div style="background-color: #181818; border-radius: 8px; padding: 20px; width: 250px; border-left: 4px solid #9b59b6; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                <p style="color: #b3b3b3; margin: 0 0 10px 0; font-size: 0.9rem;">Os seus Álbuns</p>
+                <h2 style="margin: 0; font-size: 1.2rem; color: #9b59b6;">
+                    <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}" style="color: #9b59b6; text-decoration: none;">Gerenciar</a>
+                </h2>
+            </div>
+
+            <!-- Cartão Músicas / Ações Rápidas -->
+            <div style="background-color: #181818; border-radius: 8px; padding: 20px; width: 250px; border-left: 4px solid #f39c12; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                <p style="color: #b3b3b3; margin: 0 0 10px 0; font-size: 0.9rem;">Ações Rápidas</p>
+                <h2 style="margin: 0; font-size: 1.2rem; color: #f39c12;">
+                    <a href="{{ url_for('musico_cadastrar_musica', musico_id=musico_id) }}" style="color: #f39c12; text-decoration: none;">+ Nova Música</a>
+                </h2>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
