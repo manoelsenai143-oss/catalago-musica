@@ -1,17 +1,16 @@
-
+import os
 import psycopg2
+from dotenv import load_dotenv
+
+load_dotenv()  # Carrega o .env se estiveres no PC local
+
 
 def criar_conexao():
     try:
-        conexao = psycopg2.connect(
-            host="localhost",
-            database="catalago_musica",
-            user="postgres",
-            password="1234",
-            port="5432",
-            client_encoding="UTF8"
-        )
+        # O psycopg2 aceita a DATABASE_URL diretamente como string de conexão!
+        database_url = os.environ.get('DATABASE_URL')
 
+        conexao = psycopg2.connect(database_url)
         return conexao
 
     except psycopg2.Error as erro:
