@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Álbum - Painel do Músico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background-color: #121212; color: #fff; margin: 0; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden;">
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <div style="width: 240px; background-color: #000; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; border-right: 1px solid #222;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px; color: #1db954; font-weight: bold; font-size: 1.2rem;">
+                🎵 Sistema
+            </div>
+
+            <nav style="display: flex; flex-direction: column; gap: 15px;">
+                <a href="{{ url_for('musico_home', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    🏠 Início
+                </a>
+                <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    🎶 Músicas
+                </a>
+                <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}" style="color: #fff; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    💿 Álbuns
+                </a>
+            </nav>
+        </div>
+
+        <div>
+            <a href="{{ url_for('logout') }}" style="color: #e74c3c; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                🚪 Terminar Sessão
+            </a>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div style="flex: 1; padding: 40px; overflow-y: auto; background-color: #121212;">
+        <div style="max-width: 600px; margin: auto; background-color: #181818; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+            <h2 style="color: #fff; margin-top: 0; margin-bottom: 25px;">💿 Editar Álbum</h2>
+
+            <form method="POST">
+                <!-- Nome do Álbum -->
+                <div style="margin-bottom: 20px;">
+                    <label for="nome_album" style="display: block; margin-bottom: 8px; font-weight: bold; color: #b3b3b3;">Nome do Álbum:</label>
+                    <input type="text" id="nome_album" name="nome_album" value="{{ album.nome_album }}" required style="width: 100%; padding: 10px; background-color: #222; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;">
+                </div>
+
+                <!-- Ano do Álbum -->
+                <div style="margin-bottom: 25px;">
+                    <label for="ano_album" style="display: block; margin-bottom: 8px; font-weight: bold; color: #b3b3b3;">Ano de Lançamento:</label>
+                    <input type="number" id="ano_album" name="ano_album" value="{{ album.ano_album }}" required style="width: 100%; padding: 10px; background-color: #222; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;">
+                </div>
+
+                <!-- Botões de Ação -->
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" style="flex: 1; padding: 12px; background-color: #1db954; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Salvar Alterações</button>
+                    <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}" style="flex: 1; text-align: center; padding: 12px; background-color: #333; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

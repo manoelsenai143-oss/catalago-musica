@@ -2,23 +2,89 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Editar Música</title>
+    <title>Editar Música - Painel do Músico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <h2>Editar Música</h2>
+<body style="background-color: #121212; color: #fff; margin: 0; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden;">
 
-    <!-- O action aponta para a rota específica da música usando o ID dela -->
-    <form action="/musicas/editar/{{ musica.id_musica }}" method="POST">
-        <label>Título:</label><br>
-        <input type="text" name="titulo" value="{{ musica.titulo }}" required><br><br>
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <div style="width: 240px; background-color: #000; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; border-right: 1px solid #222;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px; color: #1db954; font-weight: bold; font-size: 1.2rem;">
+                🎵 Sistema
+            </div>
 
-        <label>Duração (segundos):</label><br>
-        <!-- Como a coluna no banco tem acento, usamos colchetes no Jinja para evitar problemas -->
-        <input type="number" name="duracao" value="{{ musica['duração'] }}" required><br><br>
+            <nav style="display: flex; flex-direction: column; gap: 15px;">
+                <a href="{{ url_for('musico_home', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    🏠 Início
+                </a>
+                <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}" style="color: #fff; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    🎶 Músicas
+                </a>
+                <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    💿 Álbuns
+                </a>
+            </nav>
+        </div>
 
-        <button type="submit">Salvar Alterações</button>
-    </form>
-    <br>
-    <a href="/musicas">Cancelar / Voltar</a>
+        <div>
+            <a href="{{ url_for('logout') }}" style="color: #e74c3c; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                🚪 Terminar Sessão
+            </a>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div style="flex: 1; padding: 40px; overflow-y: auto; background-color: #121212;">
+        <div style="max-width: 600px; margin: auto; background-color: #181818; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+            <h2 style="color: #fff; margin-top: 0; margin-bottom: 25px;">✏️ Editar Música</h2>
+
+            <form method="POST">
+                <!-- Título -->
+                <div style="margin-bottom: 20px;">
+                    <label for="titulo" style="display: block; margin-bottom: 8px; font-weight: bold; color: #b3b3b3;">Título:</label>
+                    <input type="text" id="titulo" name="titulo" value="{{ musica.titulo }}" required style="width: 100%; padding: 10px; background-color: #222; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;">
+                </div>
+
+                <!-- Duração -->
+                <div style="margin-bottom: 20px;">
+                    <label for="duracao" style="display: block; margin-bottom: 8px; font-weight: bold; color: #b3b3b3;">Duração:</label>
+                    <input type="text" id="duracao" name="duracao" value="{{ musica.duracao }}" required style="width: 100%; padding: 10px; background-color: #222; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;">
+                </div>
+
+                <!-- Gênero -->
+                <div style="margin-bottom: 20px;">
+                    <label for="id_genero" style="display: block; margin-bottom: 8px; font-weight: bold; color: #b3b3b3;">Gênero:</label>
+                    <select id="id_genero" name="id_genero" required style="width: 100%; padding: 10px; background-color: #222; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;">
+                        {% for genero in generos %}
+                            <option value="{{ genero.id_genero }}" {% if genero.id_genero == musica.id_genero %}selected{% endif %}>
+                                {{ genero.nome_genero }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Álbum -->
+                <div style="margin-bottom: 25px;">
+                    <label for="id_album" style="display: block; margin-bottom: 8px; font-weight: bold; color: #b3b3b3;">Álbum:</label>
+                    <select id="id_album" name="id_album" style="width: 100%; padding: 10px; background-color: #222; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;">
+                        <option value="">Nenhum (Single)</option>
+                        {% for album in albuns %}
+                            <option value="{{ album.id_album }}" {% if album.id_album == musica.id_album %}selected{% endif %}>
+                                {{ album.nome_album }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" style="flex: 1; padding: 12px; background-color: #1db954; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Salvar Alterações</button>
+                    <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}" style="flex: 1; text-align: center; padding: 12px; background-color: #333; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 </html>

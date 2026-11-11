@@ -1,0 +1,42 @@
+/* Fundo geral escuro da página */
+body {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+    font-family: sans-serif;
+    margin: 0;
+}
+
+/* Ajustar as cores do DataTables para o tema escuro */
+.dataTables_wrapper {
+    color: #ffffff;
+    padding: 20px;
+    background-color: #181818;
+    border-radius: 8px;
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+    background-color: #222;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    color: #b3b3b3 !important;
+}
+
+table.dataTable {
+    background-color: #181818 !important;
+    color: #fff !important;
+}
+
+table.dataTable tr {
+    background-color: #181818 !important;
+}
+
+table.dataTable td, table.dataTable th {
+    border-color: #333 !important;
+}

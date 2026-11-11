@@ -5,6 +5,7 @@ from database import criar_conexao
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def pagina_escolha_login():
     return render_template('login.html')
@@ -95,7 +96,7 @@ def musico_listar_musicas(musico_id):
         FROM "MUSICA" m
         LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
         JOIN "GENERO" g ON m.id_genero = g.id_genero
-        WHERE al.id_artista = %s
+        WHERE m.id_artista = %s
         ORDER BY m.id_musica ASC
     """, (musico_id,))
 
@@ -103,26 +104,36 @@ def musico_listar_musicas(musico_id):
     cursor.close()
     conexao.close()
 
-    # Corrigido para chamar o template correto que criamos
     return render_template('musico_listar.html', musicas=musicas, musico_id=musico_id)
 
 
-@app.route('/musico/musicas/novo/<int:musico_id>', methods=['GET', 'POST'])
+@app.route('/musico/cadastrar_musica/<int:musico_id>', methods=['GET', 'POST'])
 def musico_cadastrar_musica(musico_id):
     conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
     if request.method == 'POST':
         titulo = request.form['titulo']
         duracao = request.form['duracao']
-        id_album_raw = request.form.get('id_album')
-        id_album = int(id_album_raw) if id_album_raw else None
+        id_album = request.form['id_album'] if request.form['id_album'] else None
         id_genero = request.form['id_genero']
 
-        cursor = conexao.cursor()
-        cursor.execute("""
-            INSERT INTO "MUSICA" (titulo, "duração", id_album, id_genero)
-            VALUES (%s, %s, %s, %s)
-        """, (titulo, duracao, id_album, id_genero))
+        # Validar se ESTE ARTISTA específico já tem uma música com este título
+        cursor.execute('''
+            SELECT * FROM "MUSICA" 
+            WHERE titulo = %s AND id_artista = %s
+        ''', (titulo, musico_id))
+
+        if cursor.fetchone():
+            cursor.close()
+            conexao.close()
+            return "Erro: Já tens uma música cadastrada com este título!", 400
+
+        # Inserir a nova música guardando o id_artista
+        cursor.execute('''
+            INSERT INTO "MUSICA" (titulo, "duração", id_artista, id_album, id_genero) 
+            VALUES (%s, %s, %s, %s, %s)
+        ''', (titulo, duracao, musico_id, id_album, id_genero))
 
         conexao.commit()
         cursor.close()
@@ -130,48 +141,18 @@ def musico_cadastrar_musica(musico_id):
 
         return redirect(url_for('musico_listar_musicas', musico_id=musico_id))
 
-    # GET: Usa o RealDictCursor para retornar dicionários organizados
-    cursor = conexao.cursor(cursor_factory=RealDictCursor)
-
-    cursor.execute('SELECT id_genero, nome_genero FROM "GENERO"')
-    generos = cursor.fetchall()
-
-    cursor.execute('SELECT id_album, nome_album FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
+    # GET: Buscar álbuns do artista e géneros para preencher o formulário
+    cursor.execute('SELECT * FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
     albuns = cursor.fetchall()
 
+    cursor.execute('SELECT * FROM "GENERO"')
+    generos = cursor.fetchall()
+
     cursor.close()
     conexao.close()
 
-    return render_template("cadastrar_musica.html", generos=generos, albuns=albuns, musico_id=musico_id)
+    return render_template('cadastrar_musica.html', musico_id=musico_id, albuns=albuns, generos=generos)
 
-# Rota de playlists do músico ajustada para receber o musico_id e ter o nome exato esperado pelo HTML
-@app.route('/musico/playlists/<int:musico_id>', methods=['GET'])
-def musico_listar_playlists(musico_id):
-    conexao = criar_conexao()
-    cursor = conexao.cursor(cursor_factory=RealDictCursor)
-
-    # Mantemos o LEFT JOIN para garantir que as playlists aparecem mesmo sem músicas
-    cursor.execute("""
-        SELECT 
-            p.id_playlist, 
-            p.nome_playlist, 
-            u.nome_usuario,
-            STRING_AGG(m.titulo, ', ') AS musicas
-        FROM "PLAYLIST" p
-        JOIN "USUARIO" u ON p.id_usuario = u.id
-        LEFT JOIN "PLAYLIST_MUSICA" pm ON p.id_playlist = pm.id_playlist
-        LEFT JOIN "MUSICA" m ON pm.id_musica = m.id_musica
-        GROUP BY p.id_playlist, p.nome_playlist, u.nome_usuario
-        ORDER BY p.id_playlist ASC
-    """)
-    playlists = cursor.fetchall()
-    cursor.close()
-    conexao.close()
-
-    return render_template('listar_playlist.html', playlists=playlists, musico_id=musico_id)
-
-
-# Rota para o Músico visualizar apenas os seus próprios álbuns
 @app.route('/musico/albuns/<int:musico_id>', methods=['GET'])
 def musico_listar_albuns(musico_id):
     conexao = criar_conexao()
@@ -210,6 +191,113 @@ def musico_cadastrar_album(musico_id):
         return redirect(url_for('musico_home', musico_id=musico_id))
 
     return render_template("musico_cadastrar_album.html", musico_id=musico_id)
+
+@app.route('/musico/albuns/editar/<int:musico_id>/<int:id_album>', methods=['GET', 'POST'])
+def atualizar_album(musico_id, id_album):
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    if request.method == 'POST':
+        nome_album = request.form['nome_album']
+        ano_album = request.form['ano_album']
+
+        # Atualiza o álbum garantindo que pertence a este artista
+        cursor.execute(
+            '''UPDATE "ALBUM" 
+               SET nome_album = %s, ano_album = %s 
+               WHERE id_album = %s AND id_artista = %s''',
+            (nome_album, ano_album, id_album, musico_id)
+        )
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+
+        return redirect(url_for('musico_listar_albuns', musico_id=musico_id))
+
+    # GET: Buscar dados atuais do álbum para preencher o formulário
+    cursor.execute('SELECT * FROM "ALBUM" WHERE id_album = %s AND id_artista = %s', (id_album, musico_id))
+    album = cursor.fetchone()
+
+    cursor.close()
+    conexao.close()
+
+    return render_template('editar_album.html', album=album, musico_id=musico_id)
+
+@app.route('/musico/albuns/excluir/<int:musico_id>/<int:id_album>', methods=['POST'])
+def musico_excluir_album(musico_id, id_album):
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+
+    try:
+        # 1. Apaga primeiro as músicas associadas a este álbum para evitar o erro de chave estrangeira
+        cursor.execute('DELETE FROM "MUSICA" WHERE id_album = %s', (id_album,))
+
+        # 2. Agora apaga o álbum com segurança
+        cursor.execute('DELETE FROM "ALBUM" WHERE id_album = %s AND id_artista = %s', (id_album, musico_id))
+
+        conexao.commit()
+    except Exception as e:
+        conexao.rollback()
+        print(f"Erro ao excluir álbum: {e}")
+    finally:
+        cursor.close()
+        conexao.close()
+
+    return redirect(url_for('musico_listar_albuns', musico_id=musico_id))
+
+
+@app.route('/musico/musicas/excluir/<int:musico_id>/<int:id_musica>', methods=['POST'])
+def musico_excluir_musica(musico_id, id_musica):
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+
+    cursor.execute('DELETE FROM "MUSICA" WHERE id_musica = %s', (id_musica,))
+
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+
+    return redirect(url_for('musico_listar_musicas', musico_id=musico_id))
+
+
+@app.route('/musico/musicas/editar/<int:musico_id>/<int:id_musica>', methods=['GET', 'POST'])
+def atualizar_musico(musico_id, id_musica):
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    if request.method == 'POST':
+        novo_titulo = request.form['titulo']
+        nova_duracao = request.form['duracao']
+        novo_genero = request.form['id_genero']
+        novo_album = request.form['id_album'] if request.form['id_album'] else None
+
+        cursor.execute(
+            '''UPDATE "MUSICA" 
+               SET titulo = %s, "duração" = %s, id_genero = %s, id_album = %s 
+               WHERE id_musica = %s AND id_artista = %s''',
+            (novo_titulo, nova_duracao, novo_genero, novo_album, id_musica, musico_id)
+        )
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+
+        return redirect(url_for('musico_listar_musicas', musico_id=musico_id))
+
+    # GET: Buscar dados atuais da música
+    cursor.execute('SELECT * FROM "MUSICA" WHERE id_musica = %s AND id_artista = %s', (id_musica, musico_id))
+    musica = cursor.fetchone()
+
+    cursor.execute('SELECT id_genero, nome_genero FROM "GENERO"')
+    generos = cursor.fetchall()
+
+    cursor.execute('SELECT id_album, nome_album FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
+    albuns = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    return render_template('editar_musica.html', musica=musica, generos=generos, albuns=albuns, musico_id=musico_id)
+
 
 
 @app.route('/login/usuario', methods=['GET', 'POST'])
@@ -382,66 +470,6 @@ def buscar_musica():
 
     # Reutiliza o template de listagem para mostrar as músicas encontradas
     return render_template("buscar_musica.html", musicas=resultados)
-
-# 6 - Editar música
-@app.route('/musicas/editar/<int:id_musica>', methods=['GET', 'POST'])
-def editar_musica(id_musica):
-    conexao = criar_conexao()
-
-    if request.method == 'POST':
-        titulo = request.form['titulo']
-        duracao = request.form['duracao']
-
-        cursor = conexao.cursor()
-        cursor.execute("""
-            UPDATE "MUSICA"
-            SET titulo = %s, "duração" = %s
-            WHERE id_musica = %s
-        """, (titulo, duracao, id_musica))
-
-        conexao.commit()
-        cursor.close()
-        conexao.close()
-
-        return redirect(url_for('listar_musicas'))
-
-    # Se for GET, busca a música para preencher o formulário
-    cursor = conexao.cursor(cursor_factory=RealDictCursor)
-    cursor.execute('SELECT * FROM "MUSICA" WHERE id_musica = %s', (id_musica,))
-    musica = cursor.fetchone()
-    cursor.close()
-    conexao.close()
-
-    return render_template("editar_musica.html", musica=musica)
-
-# 7 - Excluir música
-@app.route('/musicas/deletar/<int:id_musica>', methods=['POST'])
-def excluir_musica(id_musica):
-    conexao = criar_conexao()
-    cursor = conexao.cursor()
-
-    cursor.execute("""
-        SELECT COUNT(*) FROM "PLAYLIST_MUSICA" WHERE id_musica = %s
-    """, (id_musica,))
-    total_playlists = cursor.fetchone()[0]
-
-    if total_playlists > 0:
-        print(f"Aviso: A música {id_musica} estava em {total_playlists} playlist(s) e foi removida delas.")
-
-    cursor.execute("""
-        DELETE FROM "PLAYLIST_MUSICA" WHERE id_musica = %s
-    """, (id_musica,))
-
-    # 3.  a música
-    cursor.execute("""
-        DELETE FROM "MUSICA" WHERE id_musica = %s
-    """, (id_musica,))
-
-    conexao.commit()
-    cursor.close()
-    conexao.close()
-
-    return redirect(url_for('listar_musicas'))
 
 
 # 8 - Criar playlist
