@@ -44,6 +44,7 @@ def login_musico():
 
     return render_template('login_musico.html', erro=erro)
 
+
 @app.route('/cadastrar_musico', methods=['GET', 'POST'])
 def cadastrar_musico():
     erro = None
@@ -63,10 +64,22 @@ def cadastrar_musico():
             cursor.close()
             conexao.close()
         else:
+            # 1. Insere na tabela musicos e obtém o ID gerado
             cursor.execute("""
                 INSERT INTO musicos (nome, cpf, senha)
                 VALUES (%s, %s, %s)
+                RETURNING id
             """, (nome, cpf, senha))
+
+            # Como estás a usar RealDictCursor, o resultado é um dicionário
+            novo_id = cursor.fetchone()['id']
+
+            # 2. Insere na tabela ARTISTA com o mesmo ID (usando OVERRIDING SYSTEM VALUE)
+            cursor.execute("""
+                INSERT INTO "ARTISTA" (id_artista, nome_artista)
+                OVERRIDING SYSTEM VALUE
+                VALUES (%s, %s)
+            """, (novo_id, nome))
 
             conexao.commit()
             cursor.close()
@@ -75,6 +88,7 @@ def cadastrar_musico():
             return redirect(url_for('login_musico'))
 
     return render_template("cadastrar_musico.html", erro=erro)
+
 
 @app.route('/musico/home/<int:musico_id>', methods=['GET', 'POST'])
 def musico_home(musico_id):
@@ -145,7 +159,7 @@ def musico_cadastrar_musica(musico_id):
     cursor.execute('SELECT * FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
     albuns = cursor.fetchall()
 
-    cursor.execute('SELECT * FROM "GENERO"')
+    cursor.execute('SELECT * FROM "GENERO" ORDER BY id_genero ASC')
     generos = cursor.fetchall()
 
     cursor.close()
@@ -287,7 +301,7 @@ def atualizar_musico(musico_id, id_musica):
     cursor.execute('SELECT * FROM "MUSICA" WHERE id_musica = %s AND id_artista = %s', (id_musica, musico_id))
     musica = cursor.fetchone()
 
-    cursor.execute('SELECT id_genero, nome_genero FROM "GENERO"')
+    cursor.execute('SELECT id_genero, nome_genero FROM "GENERO" ORDER BY id_genero ASC')
     generos = cursor.fetchall()
 
     cursor.execute('SELECT id_album, nome_album FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
@@ -384,7 +398,7 @@ def cadastrar_musica():
                 # Busca os géneros novamente para recarregar a página sem quebrar
                 conexao_gen = criar_conexao()
                 cursor_gen = conexao_gen.cursor()
-                cursor_gen.execute('SELECT id_genero, nome_genero FROM "GENERO"')
+                cursor.execute('SELECT id_genero, nome_genero FROM "GENERO" ORDER BY id_genero ASC')
                 generos = cursor_gen.fetchall()
                 cursor_gen.close()
                 conexao_gen.close()
