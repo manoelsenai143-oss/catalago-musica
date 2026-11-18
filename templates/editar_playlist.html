@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Playlist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='playlists.css') }}">
+</head>
+<body>
+
+    <!-- Link para voltar às playlists -->
+    <a href="{{ url_for('listar_playlists', usuario_id=usuario_id) }}" class="link-voltar">← Voltar às Playlists</a>
+
+    <div style="max-width: 400px; margin: 40px auto; background: #181818; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+        <h1 style="color: #ffffff; margin-top: 0; margin-bottom: 20px; font-size: 1.5em;">Editar Playlist</h1>
+
+        <form method="POST">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; color: #b3b3b3; font-weight: bold;">Nome da Playlist:</label>
+                <input type="text" name="nome_playlist" value="{{ playlist.nome_playlist }}" required style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box;">
+            </div>
+
+            <button type="submit" style="background: #1db954; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1em;">
+                Salvar Alterações
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

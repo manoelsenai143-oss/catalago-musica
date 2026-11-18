@@ -4,20 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Utilizador</title>
-    <!-- Ligação correta para o CSS separado na pasta static -->
+    <!-- Liga o CSS externo da pasta static -->
     <link rel="stylesheet" href="{{ url_for('static', filename='usuario_home.css') }}">
 </head>
 <body>
 
-    <!-- Menu Lateral -->
+    <!-- Menu Lateral com o usuario_id incluído em todos os links -->
     <div class="sidebar">
         <h3>Sistema</h3>
-        <a href="{{ url_for('usuario_home') }}">Início</a>
-        <a href="{{ url_for('listar_musicas') }}">Músicas</a>
-        <a href="{{ url_for('listar_playlists') }}">Playlists</a>
 
-        <!-- Botão de Terminar Sessão corrigido -->
-        <a href="{{ url_for('logout') }}" class="botao-sair">Terminar Sessão</a>
+        <!-- Link para a própria Home com o ID incluído -->
+        <a href="{{ url_for('usuario_home', usuario_id=usuario_id) }}">Início</a>
+
+        <!-- Link para as Músicas com o ID incluído -->
+        <a href="{{ url_for('listar_musicas', usuario_id=usuario_id) }}">Músicas</a>
+
+        <!-- Link para as Playlists com o ID incluído -->
+        <a href="{{ url_for('listar_playlists', usuario_id=usuario_id) }}">Playlists</a>
+
+        <!-- Botão de Terminar Sessão (este não precisa de ID porque vai para o login geral) -->
+        <a href="{{ url_for('login_usuario') }}" class="botao-sair">Terminar Sessão</a>
     </div>
 
     <!-- Conteúdo do Painel -->

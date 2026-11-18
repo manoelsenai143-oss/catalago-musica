@@ -1,0 +1,74 @@
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 40px;
+}
+
+h1 {
+    color: #1db954;
+}
+
+.link-voltar {
+    color: #1db954;
+    text-decoration: none;
+}
+
+.link-voltar:hover {
+    text-decoration: underline;
+}
+
+.subtitulo {
+    color: #b3b3b3;
+    margin-bottom: 20px;
+}
+
+/* Ajustes visuais para adaptar o DataTables ao tema escuro */
+.dataTables_wrapper {
+    color: #ffffff;
+    margin-top: 20px;
+}
+
+table.dataTable {
+    background-color: #1e1e1e;
+    color: #ffffff !important;
+    border-radius: 6px;
+    overflow: hidden;
+    border: none !important;
+}
+
+table.dataTable tr.odd {
+    background-color: #181818 !important;
+}
+
+table.dataTable tr.even {
+    background-color: #1e1e1e !important;
+}
+
+.dataTables_filter input, .dataTables_length select {
+    background: #2a2a2a;
+    color: white;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.dataTables_info, .dataTables_paginate {
+    color: #b3b3b3 !important;
+    margin-top: 15px;
+}
+
+.btn-remover {
+    background: #ff5252;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-remover:hover {
+    background: #ff3333;
+}

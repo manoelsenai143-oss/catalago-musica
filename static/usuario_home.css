@@ -7,7 +7,6 @@ body {
     height: 100vh;
 }
 
-/* Menu Lateral (Sidebar) */
 .sidebar {
     width: 240px;
     background-color: #181818;
@@ -35,7 +34,6 @@ body {
     color: #ffffff;
 }
 
-/* Botão de Terminar Sessão no fundo do menu */
 .botao-sair {
     margin-top: auto;
     color: #ff5252 !important;
@@ -46,7 +44,6 @@ body {
     color: #ff7979 !important;
 }
 
-/* Conteúdo Principal */
 .main-content {
     flex: 1;
     padding: 40px;
