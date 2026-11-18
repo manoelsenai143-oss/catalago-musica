@@ -1,44 +1,29 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Utilizador</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Ligação correta para o CSS separado na pasta static -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='usuario_home.css') }}">
 </head>
 <body>
 
     <!-- Menu Lateral -->
-    <div class="menu-lateral">
-        <h2>🎵 Sistema</h2>
-        <nav>
-            <a href="/usuario/home" class="ativo">🏠 Início</a>
-            <a href="/musicas">🎵 Músicas</a>
-            <a href="/playlists">📑 Playlists</a>
-        </nav>
+    <div class="sidebar">
+        <h3>Sistema</h3>
+        <a href="{{ url_for('usuario_home') }}">Início</a>
+        <a href="{{ url_for('listar_musicas') }}">Músicas</a>
+        <a href="{{ url_for('listar_playlists') }}">Playlists</a>
 
-        <div style="margin-top: auto;">
-            <a href="/static" style="color: #e74c3c; font-size: 0.9rem; text-decoration: none;">🚪 Terminar Sessão</a>
-        </div>
+        <!-- Botão de Terminar Sessão corrigido -->
+        <a href="{{ url_for('logout') }}" class="botao-sair">Terminar Sessão</a>
     </div>
 
-    <!-- Conteúdo Principal -->
-    <div class="conteudo-principal">
-        <header style="margin-bottom: 30px;">
-            <h1>Bem-vindo ao seu Painel!</h1>
-            <p style="color: #b3b3b3;">Gerencie as suas músicas e playlists favoritas por aqui.</p>
-        </header>
-
-        <div class="cards-grid">
-            <div class="card card-verde">
-                <h3 style="margin: 0 0 10px 0; font-size: 1rem; color: #b3b3b3;">As suas Playlists</h3>
-                <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">0</p>
-            </div>
-
-            <div class="card card-laranja">
-                <h3 style="margin: 0 0 10px 0; font-size: 1rem; color: #b3b3b3;">Músicas Favoritas</h3>
-                <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">0</p>
-            </div>
-        </div>
+    <!-- Conteúdo do Painel -->
+    <div class="main-content">
+        <h1>Bem-vindo ao seu Painel!</h1>
+        <p>Gerencie as suas músicas e playlists favoritas por aqui.</p>
     </div>
 
 </body>

@@ -1,0 +1,63 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    display: flex;
+    height: 100vh;
+}
+
+/* Menu Lateral (Sidebar) */
+.sidebar {
+    width: 240px;
+    background-color: #181818;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    border-right: 1px solid #282828;
+}
+
+.sidebar h3 {
+    color: #1db954;
+    margin-bottom: 30px;
+}
+
+.sidebar a {
+    color: #b3b3b3;
+    text-decoration: none;
+    padding: 10px 0;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+
+.sidebar a:hover {
+    color: #ffffff;
+}
+
+/* Botão de Terminar Sessão no fundo do menu */
+.botao-sair {
+    margin-top: auto;
+    color: #ff5252 !important;
+    font-weight: bold;
+}
+
+.botao-sair:hover {
+    color: #ff7979 !important;
+}
+
+/* Conteúdo Principal */
+.main-content {
+    flex: 1;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #b3b3b3;
+}

@@ -345,27 +345,42 @@ def login_usuario():
 # 1 - Cadastrar usuário
 @app.route('/cadastrar_usuario', methods=['GET', 'POST'])
 def cadastrar_usuario():
+    erro = None
     if request.method == 'POST':
         nome = request.form['nome_usuario']
         email = request.form['email']
         senha = request.form['senha']
 
         conexao = criar_conexao()
-        cursor = conexao.cursor()
+        cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+        # Verifica APENAS se o email já existe na base de dados
         cursor.execute("""
-            INSERT INTO "USUARIO" (nome_usuario, email, senha)
-            VALUES (%s, %s, %s)
-        """, (nome, email, senha))
-        conexao.commit()
-        cursor.close()
-        conexao.close()
+            SELECT * FROM "USUARIO" 
+            WHERE email = %s
+        """, (email,))
 
-        return redirect(url_for('login_usuario'))
+        usuario_existente = cursor.fetchone()
 
-    return render_template("cadastrar_usuario.html")
+        if usuario_existente:
+            erro = "Este email já está a ser utilizado por outra conta."
+            cursor.close()
+            conexao.close()
+        else:
+            # Se o email for único, permite o cadastro (mesmo que o nome seja igual)
+            cursor.execute("""
+                INSERT INTO "USUARIO" (nome_usuario, email, senha)
+                VALUES (%s, %s, %s)
+            """, (nome, email, senha))
 
+            conexao.commit()
+            cursor.close()
+            conexao.close()
 
-# Rota de Login (GET mostra o formulário, POST valida no banco)
+            return redirect(url_for('login_usuario'))
+
+    return render_template("cadastrar_usuario.html", erro=erro)
+
 
 @app.route('/usuario/home')
 def usuario_home():
@@ -487,54 +502,42 @@ def buscar_musica():
 
 
 # 8 - Criar playlist
-@app.route('/playlists/novo', methods=['GET', 'POST'])
-def criar_playlist():
+@app.route('/usuario/<int:usuario_id>/criar_playlist', methods=['GET', 'POST'])
+def criar_playlist(usuario_id):
     if request.method == 'POST':
         nome_playlist = request.form['nome_playlist']
-        id_usuario = request.form['id_usuario']
 
         conexao = criar_conexao()
         cursor = conexao.cursor()
 
+        # Insere a playlist associando ao id do utilizador
         cursor.execute("""
-            INSERT INTO "PLAYLIST" (nome_playlist, id_usuario)
+            INSERT INTO "PLAYLIST" (nome_playlist, usuario_id)
             VALUES (%s, %s)
-        """, (nome_playlist, id_usuario))
+        """, (nome_playlist, usuario_id))
 
         conexao.commit()
         cursor.close()
         conexao.close()
 
-        # Alterado para redirecionar para a lista de playlists
-        return redirect(url_for('listar_playlists'))
+        return redirect(url_for('listar_playlists', usuario_id=usuario_id))
 
-    return render_template("criar_playlist.html")
+    return render_template("criar_playlist.html", usuario_id=usuario_id)
 
 # 9 - Listar playlists
-@app.route('/playlists', methods=['GET'])
-def listar_playlists():
+@app.route('/usuario/<int:usuario_id>/playlists')
+def listar_playlists(usuario_id):
     conexao = criar_conexao()
     cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
-    # Usamos o LEFT JOIN para trazer as músicas e o STRING_AGG para agrupá-las
-    cursor.execute("""
-        SELECT 
-            p.id_playlist, 
-            p.nome_playlist, 
-            u.nome_usuario,
-            STRING_AGG(m.titulo, ', ') AS musicas
-        FROM "PLAYLIST" p
-        JOIN "USUARIO" u ON p.id_usuario = u.id
-        JOIN "PLAYLIST_MUSICA" pm ON p.id_playlist = pm.id_playlist
-        JOIN "MUSICA" m ON pm.id_musica = m.id_musica
-        GROUP BY p.id_playlist, p.nome_playlist, u.nome_usuario
-        ORDER BY p.id_playlist ASC
-    """)
-    resultados = cursor.fetchall()
+    # Busca apenas as playlists que pertencem a este utilizador específico
+    cursor.execute('SELECT * FROM "PLAYLIST" WHERE usuario_id = %s', (usuario_id,))
+    playlists = cursor.fetchall()
+
     cursor.close()
     conexao.close()
 
-    return render_template("listar_playlists.html", playlists=resultados)
+    return render_template("playlists.html", playlists=playlists, usuario_id=usuario_id)
 
 
 # 10 - Adicionar música à playlist
@@ -571,6 +574,25 @@ def adicionar_musica_playlist():
     conexao.close()
 
     return render_template("adicionar_musica_playlist.html", playlists=playlists, musicas=musicas)
+
+
+@app.route('/usuario/<int:usuario_id>/excluir_playlist/<int:playlist_id>', methods=['POST'])
+def excluir_playlist(usuario_id, playlist_id):
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+
+    # Apaga apenas se o ID da playlist pertencer ao utilizador atual
+    cursor.execute("""
+        DELETE FROM "PLAYLIST" 
+        WHERE id = %s AND usuario_id = %s
+    """, (playlist_id, usuario_id))
+
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+
+    return redirect(url_for('listar_playlists', usuario_id=usuario_id))
+
 
 
 if __name__ == '__main__':
