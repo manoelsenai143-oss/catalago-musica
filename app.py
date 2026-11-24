@@ -14,17 +14,33 @@ def pagina_escolha_login():
 def logout():
     return redirect('/')
 
+
 @app.route('/login/admin', methods=['GET', 'POST'])
 def login_admin_page():
     erro = None
     if request.method == 'POST':
-        usuario = request.form.get('usuario')
+        email = request.form.get('usuario')  # O input do formulário continua a enviar o valor
         senha = request.form.get('senha')
-        if usuario == "admin" and senha == "admin123":
+
+        conexao = criar_conexao()
+        cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+        # Procura o administrador na tabela do Neon
+        cursor.execute("""
+            SELECT * FROM "ADMIN" WHERE email = %s AND senha = %s
+        """, (email, senha))
+        admin = cursor.fetchone()
+
+        cursor.close()
+        conexao.close()
+
+        if admin:
             return redirect(url_for('admin_home'))
         else:
-            erro = "Utilizador ou senha de administrador incorretos."
+            erro = "Email ou senha de administrador incorretos."
+
     return render_template('login_admin.html', erro=erro)
+
 
 
 
@@ -84,7 +100,6 @@ def admin_gerenciar_generos():
 
     return render_template('admin_generos.html', generos=generos)
 
-
 # Excluir Gênero
 @app.route('/admin/generos/excluir/<int:id_genero>', methods=['POST'])
 def admin_excluir_genero(id_genero):
@@ -102,6 +117,193 @@ def admin_excluir_genero(id_genero):
         conexao.close()
 
     return redirect(url_for('admin_gerenciar_generos'))
+
+
+
+@app.route('/admin/usuarios', methods=['GET'])
+def admin_listar_usuarios():
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+    cursor.execute('SELECT * FROM "USUARIO" ORDER BY id ASC')
+    usuarios = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+    return render_template('admin_usuarios.html', usuarios=usuarios)
+
+
+@app.route('/admin/usuarios/excluir/<int:usuario_id>', methods=['POST'])
+def admin_excluir_usuario(usuario_id):
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+    try:
+        # Apaga primeiro as playlists do utilizador e as músicas associadas a elas
+        cursor.execute('SELECT id_playlist FROM "PLAYLIST" WHERE id_usuario = %s', (usuario_id,))
+        playlists = cursor.fetchall()
+        for p in playlists:
+            id_p = p['id_playlist'] if isinstance(p, dict) else p[0]
+            cursor.execute('DELETE FROM "PLAYLIST_MUSICA" WHERE id_playlist = %s', (id_p,))
+
+        cursor.execute('DELETE FROM "PLAYLIST" WHERE id_usuario = %s', (usuario_id,))
+        cursor.execute('DELETE FROM "USUARIO" WHERE id = %s', (usuario_id,))
+        conexao.commit()
+    except Exception as e:
+        conexao.rollback()
+        print(f"Erro ao excluir utilizador: {e}")
+    finally:
+        cursor.close()
+        conexao.close()
+    return redirect(url_for('admin_listar_usuarios'))
+
+
+# ==================== GESTÃO DE MÚSICOS PELO ADMIN ====================
+
+@app.route('/admin/musicos', methods=['GET'])
+def admin_listar_musicos():
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+    cursor.execute('SELECT * FROM musicos ORDER BY id ASC')
+    musicos = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+    return render_template('admin_musicos.html', musicos=musicos)
+
+
+@app.route('/admin/musicos/excluir/<int:musico_id>', methods=['POST'])
+def admin_excluir_musico(musico_id):
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+    try:
+        # Apagar álbuns, músicas e registo de artista associados ao músico
+        cursor.execute('SELECT id_album FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
+        albuns = cursor.fetchall()
+        for a in albuns:
+            id_a = a['id_album'] if isinstance(a, dict) else a[0]
+            cursor.execute('SELECT id_musica FROM "MUSICA" WHERE id_album = %s', (id_a,))
+            musicas_album = cursor.fetchall()
+            for m in musicas_album:
+                id_m = m['id_musica'] if isinstance(m, dict) else m[0]
+                cursor.execute('DELETE FROM "PLAYLIST_MUSICA" WHERE id_musica = %s', (id_m,))
+            cursor.execute('DELETE FROM "MUSICA" WHERE id_album = %s', (id_a,))
+
+        cursor.execute('DELETE FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
+        cursor.execute('DELETE FROM "MUSICA" WHERE id_artista = %s', (musico_id,))
+        cursor.execute('DELETE FROM "ARTISTA" WHERE id_artista = %s', (musico_id,))
+        cursor.execute('DELETE FROM musicos WHERE id = %s', (musico_id,))
+
+        conexao.commit()
+    except Exception as e:
+        conexao.rollback()
+        print(f"Erro ao excluir músico: {e}")
+    finally:
+        cursor.close()
+        conexao.close()
+    return redirect(url_for('admin_listar_musicos'))
+
+
+@app.route('/admin/musicas', methods=['GET'])
+def admin_listar_todas_musicas():
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    # Reutiliza a query robusta com COALESCE para garantir a resolução correta do artista
+    cursor.execute("""
+        SELECT 
+            m.id_musica AS id,
+            m.titulo,
+            m."duração" AS duracao,
+            COALESCE(art.nome_artista, art_direto.nome_artista, mus.nome, 'Desconhecido') AS artista,
+            COALESCE(al.nome_album, 'Sem Álbum') AS album,
+            g.nome_genero AS genero
+        FROM "MUSICA" m
+        LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
+        LEFT JOIN "ARTISTA" art ON al.id_artista = art.id_artista
+        LEFT JOIN "ARTISTA" art_direto ON m.id_artista = art_direto.id_artista
+        LEFT JOIN musicos mus ON m.id_artista = mus.id
+        JOIN "GENERO" g ON m.id_genero = g.id_genero
+        ORDER BY m.id_musica ASC
+    """)
+    musicas = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    return render_template('admin_musicas_geral.html', musicas=musicas)
+
+
+@app.route('/admin/musicas/excluir/<int:musica_id>', methods=['POST'])
+def admin_excluir_musica_global(musica_id):
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+    try:
+        # Apaga primeiro das playlists para evitar erros de chave estrangeira
+        cursor.execute('DELETE FROM "PLAYLIST_MUSICA" WHERE id_musica = %s', (musica_id,))
+        # Remove a música
+        cursor.execute('DELETE FROM "MUSICA" WHERE id_musica = %s', (musica_id,))
+        conexao.commit()
+    except Exception as e:
+        conexao.rollback()
+        print(f"Erro ao excluir música pelo admin: {e}")
+    finally:
+        cursor.close()
+        conexao.close()
+
+    return redirect(url_for('admin_listar_todas_musicas'))
+
+
+@app.route('/admin/albuns', methods=['GET'])
+def admin_listar_todos_albuns():
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute("""
+        SELECT 
+            al.id_album,
+            al.nome_album,
+            al.ano_album,
+            COALESCE(art.nome_artista, mus.nome, 'Desconhecido') AS artista
+        FROM "ALBUM" al
+        LEFT JOIN "ARTISTA" art ON al.id_artista = art.id_artista
+        LEFT JOIN musicos mus ON al.id_artista = mus.id
+        ORDER BY al.id_album ASC
+    """)
+    albuns = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    return render_template('admin_albuns_geral.html', albuns=albuns)
+
+
+@app.route('/admin/albuns/excluir/<int:id_album>', methods=['POST'])
+def admin_excluir_album_global(id_album):
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+    try:
+        # 1. Encontra todas as músicas associadas a este álbum
+        cursor.execute('SELECT id_musica FROM "MUSICA" WHERE id_album = %s', (id_album,))
+        musicas_album = cursor.fetchall()
+
+        # 2. Apaga as ligações nas playlists para evitar erros de chave estrangeira
+        for musica in musicas_album:
+            id_musica = musica['id_musica'] if isinstance(musica, dict) else musica[0]
+            cursor.execute('DELETE FROM "PLAYLIST_MUSICA" WHERE id_musica = %s', (id_musica,))
+
+        # 3. Apaga as músicas do álbum
+        cursor.execute('DELETE FROM "MUSICA" WHERE id_album = %s', (id_album,))
+
+        # 4. Apaga o álbum
+        cursor.execute('DELETE FROM "ALBUM" WHERE id_album = %s', (id_album,))
+
+        conexao.commit()
+    except Exception as e:
+        conexao.rollback()
+        print(f"Erro ao excluir álbum pelo admin: {e}")
+    finally:
+        cursor.close()
+        conexao.close()
+
+    return redirect(url_for('admin_listar_todos_albuns'))
+
+
+
 
 
 

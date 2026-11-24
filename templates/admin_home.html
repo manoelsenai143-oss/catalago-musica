@@ -1,62 +1,50 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <title>Painel do Administrador</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Painel Admin</a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link text-danger" href="{{ url_for('logout') }}">Terminar Sessão</a>
-            </div>
+<body style="background-color: #121212; color: #fff; font-family: Arial, sans-serif; padding: 40px; margin: 0;">
+    <div style="max-width: 900px; margin: auto; background: #181818; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+
+        <!-- Cabeçalho -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 30px;">
+            <h2 style="color: #e74c3c; margin: 0;">🛡️ Painel de Administração</h2>
+            <a href="{{ url_for('logout') }}" style="background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 0.9rem;">Sair</a>
         </div>
-    </nav>
 
-    <div class="container mt-5">
-        <h2 class="mb-4">Visão Geral da Plataforma</h2>
-
-        <div class="row text-center">
-            <div class="col-md-3 mb-3">
-                <div class="card text-white bg-primary shadow-sm">
-                    <div class="card-body">
-                        <h5>Utilizadores</h5>
-                        <h3>{{ total_usuarios }}</h3>
-                    </div>
-                </div>
+        <!-- Estatísticas da Plataforma -->
+        <h3 style="color: #b3b3b3; margin-bottom: 15px; font-size: 1.1rem;">Estatísticas Gerais</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px;">
+            <div style="background: #222; padding: 20px; border-radius: 8px; text-align: center; border-top: 4px solid #1db954;">
+                <p style="margin: 0; color: #b3b3b3; font-size: 0.9rem;">Utilizadores</p>
+                <h2 style="margin: 10px 0 0 0; color: #fff; font-size: 2rem;">{{ total_usuarios }}</h2>
             </div>
-            <div class="col-md-3 mb-3">
-                <div class="card text-white bg-success shadow-sm">
-                    <div class="card-body">
-                        <h5>Músicos</h5>
-                        <h3>{{ total_musicos }}</h3>
-                    </div>
-                </div>
+            <div style="background: #222; padding: 20px; border-radius: 8px; text-align: center; border-top: 4px solid #f39c12;">
+                <p style="margin: 0; color: #b3b3b3; font-size: 0.9rem;">Músicos</p>
+                <h2 style="margin: 10px 0 0 0; color: #fff; font-size: 2rem;">{{ total_musicos }}</h2>
             </div>
-            <div class="col-md-3 mb-3">
-                <div class="card text-white bg-warning shadow-sm">
-                    <div class="card-body">
-                        <h5>Músicas</h5>
-                        <h3>{{ total_musicas }}</h3>
-                    </div>
-                </div>
+            <div style="background: #222; padding: 20px; border-radius: 8px; text-align: center; border-top: 4px solid #3498db;">
+                <p style="margin: 0; color: #b3b3b3; font-size: 0.9rem;">Músicas</p>
+                <h2 style="margin: 10px 0 0 0; color: #fff; font-size: 2rem;">{{ total_musicas }}</h2>
             </div>
-            <div class="col-md-3 mb-3">
-                <div class="card text-white bg-info shadow-sm">
-                    <div class="card-body">
-                        <h5>Álbuns</h5>
-                        <h3>{{ total_albuns }}</h3>
-                    </div>
-                </div>
+            <div style="background: #222; padding: 20px; border-radius: 8px; text-align: center; border-top: 4px solid #9b59b6;">
+                <p style="margin: 0; color: #b3b3b3; font-size: 0.9rem;">Álbuns</p>
+                <h2 style="margin: 10px 0 0 0; color: #fff; font-size: 2rem;">{{ total_albuns }}</h2>
             </div>
         </div>
 
-        <div class="mt-4">
-            <h4>Ações Rápidas</h4>
-            <a href="{{ url_for('admin_gerenciar_generos') }}" class="btn btn-dark mt-2">Gerir Géneros Musicais</a>
+        <!-- Gestão do Sistema (Botões de Ação) -->
+        <h3 style="color: #b3b3b3; margin-bottom: 15px; font-size: 1.1rem;">Gestão da Plataforma</h3>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <a href="{{ url_for('admin_gerenciar_generos') }}" style="background: #3498db; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; flex: 1; min-width: 150px;">🎵 Gerir Géneros</a>
+            <a href="{{ url_for('admin_listar_usuarios') }}" style="background: #1db954; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; flex: 1; min-width: 150px;">👥 Gerir Utilizadores</a>
+            <a href="{{ url_for('admin_listar_musicos') }}" style="background: #f39c12; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; flex: 1; min-width: 150px;">🎸 Gerir Músicos</a>
+            <a href="{{ url_for('admin_listar_todas_musicas') }}" style="background: #9b59b6; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; flex: 1; min-width: 150px;">🎶 Gerir Músicas</a>
+            <a href="{{ url_for('admin_listar_todos_albuns') }}" style="background: #9b59b6; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; flex: 1; min-width: 150px;">💿 Gerir Álbuns</a>
         </div>
+
     </div>
 </body>
 </html>
