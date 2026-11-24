@@ -9,8 +9,10 @@
     <div style="background-color: #181818; padding: 40px; border-radius: 10px; width: 350px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
         <h2 style="color: #f39c12; margin-bottom: 20px;">🎸 Área do Músico</h2>
         <form action="/login/musico" method="POST">
+
+            <!-- CAMPO DO CPF ATUALIZADO COM A MÁSCARA -->
             <label style="display: block; margin-bottom: 5px;">CPF:</label>
-            <input type="text" name="cpf" placeholder="000.000.000-00" required style="width: 100%; padding: 10px; margin-bottom: 15px; background: #333; border: none; color: #fff; border-radius: 5px;">
+            <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)" required style="width: 100%; padding: 10px; margin-bottom: 15px; background: #333; border: none; color: #fff; border-radius: 5px;">
 
             <label style="display: block; margin-bottom: 5px;">Senha:</label>
             <input type="password" name="senha" required style="width: 100%; padding: 10px; margin-bottom: 20px; background: #333; border: none; color: #fff; border-radius: 5px;">
@@ -26,5 +28,17 @@
         <p style="margin-top: 15px; text-align: center;"><a href="{{ url_for('pagina_escolha_login') }}" style="color: #b3b3b3; text-decoration: none;">← Voltar ao Início</a>
         </p>
     </div>
+
+    <!-- SCRIPT PARA A MÁSCARA DO CPF -->
+    <script>
+    function mascaraCPF(i) {
+        let v = i.value;
+        v = v.replace(/\D/g, ""); // Remove tudo o que não for número
+        v = v.replace(/^(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3");
+        v = v.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})$/, "$1.$2.$3-$4");
+        i.value = v;
+    }
+    </script>
 </body>
 </html>
