@@ -769,10 +769,13 @@ def cadastrar_musica():
 
 @app.route('/musicas', methods=['GET'])
 def listar_musicas():
+    # 1. Pega o usuario_id que vem por parâmetro no link (ex: /musicas?usuario_id=51)
+    usuario_id = request.args.get('usuario_id')
+
     conexao = criar_conexao()
     cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
-    # Query corrigida com COALESCE completo para encontrar o artista pelo álbum, pela música ou pela tabela de músicos
+    # (A tua query SQL continua exatamente igual...)
     cursor.execute("""
         SELECT 
             m.id_musica AS id,
@@ -793,8 +796,8 @@ def listar_musicas():
     cursor.close()
     conexao.close()
 
-    return render_template("buscar_musica.html", musicas=resultados)
-
+    # 2. Passa o usuario_id para o render_template!
+    return render_template("buscar_musica.html", musicas=resultados, usuario_id=usuario_id)
 
 
 
@@ -947,18 +950,18 @@ def detalhes_playlist(usuario_id, playlist_id):
         conexao.close()
         return "Playlist não encontrada", 404
 
-    # 2. Busca as músicas da playlist incluindo o Artista diretamente (funciona com ou sem álbum!)
+    # 2. Busca as músicas da playlist incluindo explicitamente a duração!
     cursor.execute("""
         SELECT 
             m.id_musica,
             m.titulo,
             m."duração" AS duracao,
-            g.nome_genero AS genero,
+            COALESCE(g.nome_genero, 'Sem Género') AS genero,
             COALESCE(al.nome_album, 'Sem Álbum') AS album,
             COALESCE(art.nome_artista, mus.nome, 'Desconhecido') AS artista
         FROM "PLAYLIST_MUSICA" pm
         JOIN "MUSICA" m ON pm.id_musica = m.id_musica
-        JOIN "GENERO" g ON m.id_genero = g.id_genero
+        LEFT JOIN "GENERO" g ON m.id_genero = g.id_genero
         LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
         LEFT JOIN "ARTISTA" art ON m.id_artista = art.id_artista
         LEFT JOIN musicos mus ON m.id_artista = mus.id
@@ -970,7 +973,6 @@ def detalhes_playlist(usuario_id, playlist_id):
     conexao.close()
 
     return render_template("detalhes_playlist.html", playlist=playlist, musicas_playlist=musicas_playlist, usuario_id=usuario_id)
-
 
 
 @app.route('/usuario/<int:usuario_id>/playlist/<int:playlist_id>/remover-musica/<int:musica_id>', methods=['POST'])

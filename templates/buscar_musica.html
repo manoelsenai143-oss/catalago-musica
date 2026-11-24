@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <title>Catálogo de Músicas</title>
@@ -7,7 +7,14 @@
     <!-- 1. Importar CSS do DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 </head>
-<body>
+<body style="padding: 20px; font-family: Arial, sans-serif;">
+
+    <!-- Botão para voltar às playlists -->
+    <div style="margin-bottom: 20px;">
+        <a href="{{ url_for('usuario_home', usuario_id=usuario_id) }}" style="text-decoration: none; color: #007bff; font-weight: bold;">
+            ← Voltar para o painel
+        </a>
+    </div>
 
     <h2>Catálogo de Músicas</h2>
 
@@ -21,7 +28,6 @@
                 <th>Artista</th>
                 <th>Álbum</th>
                 <th>Género</th>
-                <!-- A coluna de Ações foi removida daqui! -->
             </tr>
         </thead>
         <tbody>
@@ -33,7 +39,6 @@
                 <td>{{ musica.artista if musica.artista else 'N/A' }}</td>
                 <td>{{ musica.album if musica.album else 'N/A' }}</td>
                 <td>{{ musica.genero }}</td>
-                <!-- Sem botões de Editar ou Excluir -->
             </tr>
             {% endfor %}
         </tbody>

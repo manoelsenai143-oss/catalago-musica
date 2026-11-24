@@ -4,47 +4,72 @@
     <meta charset="UTF-8">
     <title>Moderação de Músicas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- 1. Importar CSS do DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- Estilo para adaptar o DataTables ao tema escuro -->
+    <style>
+        .dataTables_wrapper { color: #fff; padding: 20px; background: #181818; border-radius: 6px; }
+        .dataTables_wrapper input, .dataTables_wrapper select { background: #2a2a2a; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 4px; }
+        .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate { color: #b3b3b3 !important; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button { color: #fff !important; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #1db954 !important; color: #fff !important; border: 1px solid #1db954 !important; }
+    </style>
 </head>
 <body style="background-color: #121212; color: #fff; font-family: Arial, sans-serif; padding: 40px;">
-    <div style="max-width: 950px; margin: auto; background: #181818; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+    <div style="max-width: 1050px; margin: auto; background: #181818; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+
         <h2 style="color: #3498db; margin-bottom: 20px;">🎵 Moderação Global de Músicas</h2>
 
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <!-- Tabela com ID para o DataTables -->
+        <table id="tabelaMusicasAdmin" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <thead>
                 <tr style="background: #282828; text-align: left;">
-                    <th style="padding: 10px;">ID</th>
-                    <th style="padding: 10px;">Título</th>
-                    <th style="padding: 10px;">Artista</th>
-                    <th style="padding: 10px;">Álbum</th>
-                    <th style="padding: 10px;">Género</th>
-                    <th style="padding: 10px;">Duração</th>
-                    <th style="padding: 10px; text-align: center;">Ações</th>
+                    <th style="padding: 12px;">ID</th>
+                    <th style="padding: 12px;">Título</th>
+                    <th style="padding: 12px;">Artista</th>
+                    <th style="padding: 12px;">Álbum</th>
+                    <th style="padding: 12px;">Género</th>
+                    <th style="padding: 12px;">Duração</th>
+                    <th style="padding: 12px; text-align: center; width: 110px;">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for m in musicas %}
                 <tr style="border-bottom: 1px solid #333;">
-                    <td style="padding: 10px;">{{ m.id }}</td>
-                    <td style="padding: 10px;">{{ m.titulo }}</td>
-                    <td style="padding: 10px;">{{ m.artista }}</td>
-                    <td style="padding: 10px;">{{ m.album }}</td>
-                    <td style="padding: 10px;">{{ m.genero }}</td>
-                    <td style="padding: 10px;">{{ m.duracao }}</td>
-                    <td style="padding: 10px; text-align: center;">
+                    <td style="padding: 12px;">{{ m.id }}</td>
+                    <td style="padding: 12px;">{{ m.titulo }}</td>
+                    <td style="padding: 12px;">{{ m.artista }}</td>
+                    <td style="padding: 12px;">{{ m.album }}</td>
+                    <td style="padding: 12px;">{{ m.genero }}</td>
+                    <td style="padding: 12px;">{{ m.duracao }}</td>
+                    <td style="padding: 12px; text-align: center;">
                         <form action="{{ url_for('admin_excluir_musica_global', musica_id=m.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" onclick="return confirm('Tem certeza que deseja remover esta música da plataforma?');" style="background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Excluir</button>
+                            <button type="submit" onclick="return confirm('Tem certeza que deseja remover esta música da plataforma?');" style="background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">Excluir</button>
                         </form>
                     </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="7" style="padding: 15px; text-align: center; color: #b3b3b3;">Nenhuma música registada na plataforma.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <a href="{{ url_for('admin_home') }}" style="color: #b3b3b3; text-decoration: none;">← Voltar ao Painel Admin</a>
+        <a href="{{ url_for('admin_home') }}" style="color: #b3b3b3; text-decoration: none; display: inline-block; margin-top: 10px;">← Voltar ao Painel Admin</a>
     </div>
+
+    <!-- 2. jQuery e DataTables JS -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- 3. Ativar o DataTables -->
+    <script>
+        $(document).ready(function() {
+            $('#tabelaMusicasAdmin').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json"
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -57,8 +57,7 @@
                     <td style="padding: 12px;">{{ musica.album }}</td>
                     <td style="padding: 12px;">{{ musica.genero }}</td>
                     <!-- Duração formatada em MM:SS com conversão segura para inteiro -->
-                    <td style="padding: 12px;">{{ (musica.duracao | int // 60) }}:{{ '%02d' | format(musica.duracao | int % 60) }}</td>
-                    <td style="padding: 12px; text-align: center;">
+                    <td style="padding: 12px;">{{ musica.duracao }}</td>                    <td style="padding: 12px; text-align: center;">
                         <!-- Botão para remover APENAS da playlist -->
                         <form action="{{ url_for('remover_musica_playlist', usuario_id=usuario_id, playlist_id=playlist.id_playlist, musica_id=musica.id_musica) }}" method="POST" style="margin: 0;">
                             <button type="submit" style="background: #ff5252; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; font-weight: bold;" onclick="return confirm('Tens a certeza que queres remover esta música da playlist?')">
