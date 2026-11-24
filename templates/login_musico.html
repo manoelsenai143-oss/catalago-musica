@@ -8,9 +8,13 @@
 <body style="background-color: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
     <div style="background-color: #181818; padding: 40px; border-radius: 10px; width: 350px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
         <h2 style="color: #f39c12; margin-bottom: 20px;">🎸 Área do Músico</h2>
-        <form action="/login/musico" method="POST">
 
-            <!-- CAMPO DO CPF ATUALIZADO COM A MÁSCARA -->
+        <!-- MENSAGEM DE ERRO ADICIONADA AQUI -->
+        {% if erro %}
+            <p style="color: #e74c3c; font-size: 0.9rem; margin-bottom: 15px; text-align: center;">{{ erro }}</p>
+        {% endif %}
+
+        <form action="/login/musico" method="POST">
             <label style="display: block; margin-bottom: 5px;">CPF:</label>
             <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)" required style="width: 100%; padding: 10px; margin-bottom: 15px; background: #333; border: none; color: #fff; border-radius: 5px;">
 
@@ -20,7 +24,6 @@
             <button type="submit" style="width: 100%; padding: 10px; background-color: #f39c12; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Entrar como Músico</button>
         </form>
 
-        <!-- Linha adicionada para o cadastro -->
         <p style="margin-top: 15px; text-align: center; font-size: 0.9rem; color: #b3b3b3;">
             <a href="{{ url_for('cadastrar_musico') }}" style="color: #f39c12; text-decoration: none; font-weight: bold;">Cadastre-se</a>
         </p>
@@ -29,11 +32,10 @@
         </p>
     </div>
 
-    <!-- SCRIPT PARA A MÁSCARA DO CPF -->
     <script>
     function mascaraCPF(i) {
         let v = i.value;
-        v = v.replace(/\D/g, ""); // Remove tudo o que não for número
+        v = v.replace(/\D/g, "");
         v = v.replace(/^(\d{3})(\d)/, "$1.$2");
         v = v.replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3");
         v = v.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})$/, "$1.$2.$3-$4");
