@@ -14,9 +14,96 @@ def pagina_escolha_login():
 def logout():
     return redirect('/')
 
-@app.route('/login/admin')
+@app.route('/login/admin', methods=['GET', 'POST'])
 def login_admin_page():
-    return render_template('login_admin.html')
+    erro = None
+    if request.method == 'POST':
+        usuario = request.form.get('usuario')
+        senha = request.form.get('senha')
+        if usuario == "admin" and senha == "admin123":
+            return redirect(url_for('admin_home'))
+        else:
+            erro = "Utilizador ou senha de administrador incorretos."
+    return render_template('login_admin.html', erro=erro)
+
+
+
+@app.route('/admin/home', methods=['GET'])
+def admin_home():
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute('SELECT COUNT(*) AS total FROM "USUARIO"')
+    total_usuarios = cursor.fetchone()['total']
+
+    cursor.execute('SELECT COUNT(*) AS total FROM musicos')
+    total_musicos = cursor.fetchone()['total']
+
+    cursor.execute('SELECT COUNT(*) AS total FROM "MUSICA"')
+    total_musicas = cursor.fetchone()['total']
+
+    cursor.execute('SELECT COUNT(*) AS total FROM "ALBUM"')
+    total_albuns = cursor.fetchone()['total']
+
+    cursor.close()
+    conexao.close()
+
+    return render_template(
+        'admin_home.html',
+        total_usuarios=total_usuarios,
+        total_musicos=total_musicos,
+        total_musicas=total_musicas,
+        total_albuns=total_albuns
+    )
+
+
+
+
+
+# Listar e Adicionar Gêneros
+@app.route('/admin/generos', methods=['GET', 'POST'])
+def admin_gerenciar_generos():
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    if request.method == 'POST':
+        nome_genero = request.form.get('nome_genero')
+        if nome_genero:
+            cursor.execute('INSERT INTO "GENERO" (nome_genero) VALUES (%s)', (nome_genero,))
+            conexao.commit()
+
+        cursor.close()
+        conexao.close()
+        return redirect(url_for('admin_gerenciar_generos'))
+
+    cursor.execute('SELECT * FROM "GENERO" ORDER BY id_genero ASC')
+    generos = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    return render_template('admin_generos.html', generos=generos)
+
+
+# Excluir Gênero
+@app.route('/admin/generos/excluir/<int:id_genero>', methods=['POST'])
+def admin_excluir_genero(id_genero):
+    conexao = criar_conexao()
+    cursor = conexao.cursor()
+
+    try:
+        cursor.execute('DELETE FROM "GENERO" WHERE id_genero = %s', (id_genero,))
+        conexao.commit()
+    except Exception as e:
+        conexao.rollback()
+        print(f"Erro ao excluir gênero: {e}")
+    finally:
+        cursor.close()
+        conexao.close()
+
+    return redirect(url_for('admin_gerenciar_generos'))
+
+
 
 @app.route('/login/musico', methods=['GET', 'POST'])
 def login_musico():
@@ -131,34 +218,29 @@ def musico_cadastrar_musica(musico_id):
         duracao = request.form.get('duracao')
         id_album = request.form.get('id_album') if request.form.get('id_album') else None
         id_genero = request.form.get('id_genero')
-        nome_artista = request.form.get('nome_artista')
 
-        # Inserção na base de dados
+        # Guarda a música associando diretamente o musico_id como id_artista
         cursor.execute('''
-            INSERT INTO "MUSICA" (titulo, "duração", id_album, id_genero) 
-            VALUES (%s, %s, %s, %s)
-        ''', (titulo, duracao, id_album, id_genero))
+            INSERT INTO "MUSICA" (titulo, "duração", id_album, id_genero, id_artista) 
+            VALUES (%s, %s, %s, %s, %s)
+        ''', (titulo, duracao, id_album, id_genero, musico_id))
 
         conexao.commit()
         cursor.close()
         conexao.close()
 
-        # O POST tem de terminar sempre com um redirect
         return redirect(url_for('musico_listar_musicas', musico_id=musico_id))
 
-    # --- Método GET (quando a página é aberta) ---
-    # Busca os álbuns para preencher o select
-    cursor.execute('SELECT * FROM "ALBUM"')
+    # GET: Busca álbuns e géneros filtrados diretamente pelo musico_id
+    cursor.execute('SELECT * FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
     albuns = cursor.fetchall()
 
-    # Busca os géneros para preencher o select
     cursor.execute('SELECT * FROM "GENERO"')
     generos = cursor.fetchall()
 
     cursor.close()
     conexao.close()
 
-    # O GET tem de retornar sempre a página HTML
     return render_template(
         'cadastrar_musica.html',
         musico_id=musico_id,
@@ -167,32 +249,6 @@ def musico_cadastrar_musica(musico_id):
     )
 
 
-@app.route('/musico/albuns/<int:musico_id>', methods=['GET'])
-def musico_listar_albuns(musico_id):
-    conexao = criar_conexao()
-    cursor = conexao.cursor(cursor_factory=RealDictCursor)
-
-    # Verifica o que está a ser executado
-    print(f"--- A procurar álbuns para o musico_id: {musico_id} ---")
-
-    cursor.execute("""
-        SELECT id_album, nome_album, ano_album 
-        FROM "ALBUM" 
-        WHERE id_artista = %s 
-        ORDER BY id_album ASC
-    """, (musico_id,))
-
-    albuns = cursor.fetchall()
-    print(f"Álbuns encontrados: {len(albuns)}")
-
-    cursor.close()
-    conexao.close()
-
-    return render_template('musico_listar_albuns.html', albuns=albuns, musico_id=musico_id)
-
-
-
-# Rota para o Músico criar um novo álbum
 @app.route('/musico/albuns/novo/<int:musico_id>', methods=['GET', 'POST'])
 def musico_cadastrar_album(musico_id):
     if request.method == 'POST':
@@ -211,10 +267,31 @@ def musico_cadastrar_album(musico_id):
         cursor.close()
         conexao.close()
 
-        # Redireciona para a home após cadastrar com sucesso
-        return redirect(url_for('musico_home', musico_id=musico_id))
+        return redirect(url_for('musico_listar_albuns', musico_id=musico_id))
 
     return render_template("musico_cadastrar_album.html", musico_id=musico_id)
+
+
+
+
+@app.route('/musico/albuns/<int:musico_id>', methods=['GET'])
+def musico_listar_albuns(musico_id):
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+
+    # Usa o musico_id diretamente como id_artista!
+    cursor.execute("""
+        SELECT id_album, nome_album, ano_album 
+        FROM "ALBUM" 
+        WHERE id_artista = %s 
+        ORDER BY id_album ASC
+    """, (musico_id,))
+
+    albuns = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    return render_template('musico_listar_albuns.html', albuns=albuns, musico_id=musico_id)
 
 @app.route('/musico/albuns/editar/<int:musico_id>/<int:id_album>', methods=['GET', 'POST'])
 def atualizar_album(musico_id, id_album):
@@ -277,6 +354,7 @@ def musico_excluir_album(musico_id, id_album):
         conexao.close()
 
     return redirect(url_for('musico_listar_albuns', musico_id=musico_id))
+
 
 
 @app.route('/musico/musicas/excluir/<int:musico_id>/<int:id_musica>', methods=['POST'])
@@ -480,16 +558,20 @@ def listar_musicas():
     conexao = criar_conexao()
     cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
-    # O LEFT JOIN no ALBUM permite que músicas sem álbum apareçam na lista
+    # Query corrigida com COALESCE completo para encontrar o artista pelo álbum, pela música ou pela tabela de músicos
     cursor.execute("""
         SELECT 
             m.id_musica AS id,
             m.titulo,
             m."duração" AS duracao,
-            al.nome_album AS album,
+            COALESCE(art.nome_artista, art_direto.nome_artista, mus.nome, 'Desconhecido') AS artista,
+            COALESCE(al.nome_album, 'Sem Álbum') AS album,
             g.nome_genero AS genero
         FROM "MUSICA" m
         LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
+        LEFT JOIN "ARTISTA" art ON al.id_artista = art.id_artista
+        LEFT JOIN "ARTISTA" art_direto ON m.id_artista = art_direto.id_artista
+        LEFT JOIN musicos mus ON m.id_artista = mus.id
         JOIN "GENERO" g ON m.id_genero = g.id_genero
         ORDER BY m.id_musica ASC
     """)
@@ -498,6 +580,9 @@ def listar_musicas():
     conexao.close()
 
     return render_template("buscar_musica.html", musicas=resultados)
+
+
+
 
 # 5 - Buscar música
 @app.route('/musicas/buscar', methods=['GET'])
@@ -648,7 +733,7 @@ def detalhes_playlist(usuario_id, playlist_id):
         conexao.close()
         return "Playlist não encontrada", 404
 
-    # 2. Busca as músicas da playlist, incluindo Álbum, Artista e Género
+    # 2. Busca as músicas da playlist incluindo o Artista diretamente (funciona com ou sem álbum!)
     cursor.execute("""
         SELECT 
             m.id_musica,
@@ -656,12 +741,13 @@ def detalhes_playlist(usuario_id, playlist_id):
             m."duração" AS duracao,
             g.nome_genero AS genero,
             COALESCE(al.nome_album, 'Sem Álbum') AS album,
-            COALESCE(ar.nome_artista, 'Desconhecido') AS artista
+            COALESCE(art.nome_artista, mus.nome, 'Desconhecido') AS artista
         FROM "PLAYLIST_MUSICA" pm
         JOIN "MUSICA" m ON pm.id_musica = m.id_musica
         JOIN "GENERO" g ON m.id_genero = g.id_genero
         LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
-        LEFT JOIN "ARTISTA" ar ON al.id_artista = ar.id_artista
+        LEFT JOIN "ARTISTA" art ON m.id_artista = art.id_artista
+        LEFT JOIN musicos mus ON m.id_artista = mus.id
         WHERE pm.id_playlist = %s
     """, (playlist_id,))
     musicas_playlist = cursor.fetchall()
@@ -670,6 +756,8 @@ def detalhes_playlist(usuario_id, playlist_id):
     conexao.close()
 
     return render_template("detalhes_playlist.html", playlist=playlist, musicas_playlist=musicas_playlist, usuario_id=usuario_id)
+
+
 
 @app.route('/usuario/<int:usuario_id>/playlist/<int:playlist_id>/remover-musica/<int:musica_id>', methods=['POST'])
 def remover_musica_playlist(usuario_id, playlist_id, musica_id):
