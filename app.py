@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, render_template, redirect, url_for
 from psycopg2.extras import RealDictCursor
 from database import criar_conexao
+from psycopg2.errors import UniqueViolation
 
 
 app = Flask(__name__)
@@ -357,25 +358,17 @@ def cadastrar_musico():
         conexao = criar_conexao()
         cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
-        cursor.execute('SELECT id FROM musicos WHERE cpf = %s', (cpf,))
-        musico_existente = cursor.fetchone()
-
-        if musico_existente:
-            erro = "Este CPF já está cadastrado."
-            cursor.close()
-            conexao.close()
-        else:
-            # 1. Insere na tabela musicos e obtém o ID gerado
+        try:
+            # 1. Tenta inserir na tabela musicos e obter o ID gerado
             cursor.execute("""
                 INSERT INTO musicos (nome, cpf, senha)
                 VALUES (%s, %s, %s)
                 RETURNING id
             """, (nome, cpf, senha))
 
-            # Como estás a usar RealDictCursor, o resultado é um dicionário
             novo_id = cursor.fetchone()['id']
 
-            # 2. Insere na tabela ARTISTA com o mesmo ID (usando OVERRIDING SYSTEM VALUE)
+            # 2. Insere na tabela ARTISTA com o mesmo ID
             cursor.execute("""
                 INSERT INTO "ARTISTA" (id_artista, nome_artista)
                 OVERRIDING SYSTEM VALUE
@@ -383,10 +376,20 @@ def cadastrar_musico():
             """, (novo_id, nome))
 
             conexao.commit()
+            return redirect(url_for('login_musico'))
+
+        except UniqueViolation as e:
+            conexao.rollback()  # Anula a transação pendente em caso de erro
+
+            # Verifica qual foi a restrição violada para exibir a mensagem correta
+            if 'unique_nome_musico' in str(e):
+                erro = "Este nome de músico já está em uso. Escolha outro."
+            else:
+                erro = "Este CPF já está cadastrado."
+
+        finally:
             cursor.close()
             conexao.close()
-
-            return redirect(url_for('login_musico'))
 
     return render_template("cadastrar_musico.html", erro=erro)
 
