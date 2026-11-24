@@ -107,7 +107,19 @@ def admin_excluir_genero(id_genero):
     cursor = conexao.cursor()
 
     try:
+        # Opcional: Se quiseres apagar as músicas associadas a este género antes de apagar o género:
+        # 1. Apaga as ligações nas playlists das músicas deste género
+        cursor.execute("""
+            DELETE FROM "PLAYLIST_MUSICA" 
+            WHERE id_musica IN (SELECT id_musica FROM "MUSICA" WHERE id_genero = %s)
+        """, (id_genero,))
+
+        # 2. Apaga as músicas que pertencem a este género
+        cursor.execute('DELETE FROM "MUSICA" WHERE id_genero = %s', (id_genero,))
+
+        # 3. Agora apaga o género com segurança
         cursor.execute('DELETE FROM "GENERO" WHERE id_genero = %s', (id_genero,))
+
         conexao.commit()
     except Exception as e:
         conexao.rollback()
