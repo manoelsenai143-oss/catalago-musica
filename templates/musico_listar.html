@@ -109,7 +109,35 @@
                             {% for musica in musicas %}
                             <tr>
                                 <td>{{ musica.id }}</td>
-                                <td class="titulo-musica">{{ musica.titulo }}</td>
+
+                                <!-- Título atualizado com capa, player de preview e link do Spotify -->
+                                <td class="titulo-musica">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        {% if musica.capa_url %}
+                                            <img src="{{ musica.capa_url }}" alt="Capa" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover;">
+                                        {% endif %}
+                                        <div>
+                                            <span>{{ musica.titulo }}</span>
+
+                                            <!-- Player de pré-visualização (30s), caso exista no objeto -->
+                                            {% if musica.preview_url %}
+                                                <div style="margin-top: 4px;">
+                                                    <audio controls style="height: 22px; width: 160px;">
+                                                        <source src="{{ musica.preview_url }}" type="audio/mpeg">
+                                                    </audio>
+                                                </div>
+                                            {% endif %}
+
+                                            {% if musica.spotify_url %}
+                                                <br>
+                                                <a href="{{ musica.spotify_url }}" target="_blank" style="color: #1db954; font-size: 0.75rem; text-decoration: none; display: inline-flex; align-items: center; gap: 2px;">
+                                                    <i class="material-icons" style="font-size: 12px;">play_circle_filled</i> Ouvir no Spotify
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+
                                 <td>{{ musica.duracao if musica.duracao else 'N/D' }}</td>
                                 <td>{{ musica.album if musica.album else 'Single (Sem Álbum)' }}</td>
                                 <td>{{ musica.genero if musica.genero else 'N/D' }}</td>

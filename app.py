@@ -7,6 +7,9 @@ from create_pdf_generos import criar_pdf_generos
 from create_pdf_musicas_geral import criar_pdf_musicas_geral
 from create_pdf_musicos import criar_pdf_musicos
 from create_pdf_usuarios import criar_pdf_usuarios
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+
 
 
 app = Flask(__name__)
@@ -19,6 +22,33 @@ def pagina_escolha_login():
 @app.route('/logout')
 def logout():
     return redirect('/')
+
+
+auth_manager = SpotifyClientCredentials(
+    client_id='dbd92bc3ae9941728fae65602fdea547',
+    client_secret='b95e9cb926bb4908be1d1ff04daba8ef'
+)
+sp = spotipy.Spotify(auth_manager=auth_manager)
+
+
+@app.route('/pesquisar-spotify', methods=['GET', 'POST'])
+def pesquisar_spotify():
+    resultados = []
+    if request.method == 'POST':
+        termo = request.form.get('termo')
+        if termo:
+            # Vai buscar músicas à API do Spotify
+            dados = sp.search(q=termo, limit=5, type='track')
+            for item in dados['tracks']['items']:
+                resultados.append({
+                    'titulo': item['name'],
+                    'artista': item['artists'][0]['name'],
+                    'album': item['album']['name'],
+                    'capa': item['album']['images'][0]['url'] if item['album']['images'] else '',
+                    'link_spotify': item['external_urls']['spotify']
+                })
+
+    return render_template('pesquisar_spotify.html', resultados=resultados)
 
 @app.route('/exportar-albuns-pdf')
 def exportar_albuns_pdf():
@@ -518,30 +548,28 @@ def musico_home(musico_id):
     return render_template('musico_home.html', musico_id=musico_id)
 
 
-@app.route('/musico/musicas/<int:musico_id>', methods=['GET'])
+@app.route('/musico/musicas/<int:musico_id>')
 def musico_listar_musicas(musico_id):
     conexao = criar_conexao()
     cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
-    cursor.execute("""
-        SELECT 
-            m.id_musica AS id,
-            m.titulo,
-            m."duração" AS duracao,
-            al.nome_album AS album,
-            g.nome_genero AS genero
+    cursor.execute('''
+        SELECT m.id_musica AS id, m.titulo, m."duração" AS duracao, m.capa_url, m.spotify_url, 
+               a.nome_album AS album, g.nome_genero AS genero 
         FROM "MUSICA" m
-        LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
-        JOIN "GENERO" g ON m.id_genero = g.id_genero
+        LEFT JOIN "ALBUM" a ON m.id_album = a.id_album
+        LEFT JOIN "GENERO" g ON m.id_genero = g.id_genero
         WHERE m.id_artista = %s
-        ORDER BY m.id_musica ASC
-    """, (musico_id,))
+        ORDER BY m.id_musica DESC
+    ''', (musico_id,))
 
     musicas = cursor.fetchall()
+
     cursor.close()
     conexao.close()
 
-    return render_template('musico_listar.html', musicas=musicas, musico_id=musico_id)
+    return render_template('musico_listar.html', musico_id=musico_id, musicas=musicas)
+
 
 
 @app.route('/musico/cadastrar_musica/<int:musico_id>', methods=['GET', 'POST'])
@@ -552,14 +580,35 @@ def musico_cadastrar_musica(musico_id):
     if request.method == 'POST':
         titulo = request.form.get('titulo')
         duracao = request.form.get('duracao')
-        id_album = request.form.get('id_album') if request.form.get('id_album') else None
+        id_album = request.form.get('id_album') or None
         id_genero = request.form.get('id_genero')
+        album_spotify = request.form.get('album_spotify')
+        capa_url = request.form.get('capa_url') or None
+        spotify_url = request.form.get('spotify_url') or None
 
-        # Guarda a música associando diretamente o musico_id como id_artista
+        if not id_album and album_spotify:
+            cursor.execute(
+                'SELECT id_album FROM "ALBUM" WHERE LOWER(nome_album) = LOWER(%s) AND id_artista = %s',
+                (album_spotify.strip(), musico_id)
+            )
+            album_db = cursor.fetchone()
+
+            if album_db:
+                id_album = album_db['id_album']
+            else:
+                cursor.execute(
+                    'INSERT INTO "ALBUM" (nome_album, ano_album, id_artista) VALUES (%s, %s, %s) RETURNING id_album',
+                    (album_spotify.strip(), 2026, musico_id)
+                )
+                novo_album = cursor.fetchone()
+                id_album = novo_album['id_album']
+                conexao.commit()
+
+        # Insere a música incluindo capa_url e spotify_url
         cursor.execute('''
-            INSERT INTO "MUSICA" (titulo, "duração", id_album, id_genero, id_artista) 
-            VALUES (%s, %s, %s, %s, %s)
-        ''', (titulo, duracao, id_album, id_genero, musico_id))
+            INSERT INTO "MUSICA" (titulo, "duração", id_album, id_genero, id_artista, capa_url, spotify_url) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ''', (titulo, duracao, id_album, id_genero, musico_id, capa_url, spotify_url))
 
         conexao.commit()
         cursor.close()
@@ -567,7 +616,26 @@ def musico_cadastrar_musica(musico_id):
 
         return redirect(url_for('musico_listar_musicas', musico_id=musico_id))
 
-    # GET: Busca álbuns e géneros filtrados diretamente pelo musico_id
+    termo_spotify = request.args.get('busca_spotify')
+    resultados_spotify = []
+
+    if termo_spotify:
+        pesquisa = sp.search(q=termo_spotify, type='track', limit=5)
+        for item in pesquisa['tracks']['items']:
+            ms = item['duration_ms']
+            segundos = (ms // 1000) % 60
+            minutos = (ms // (1000 * 60)) % 60
+            duracao_formatada = f"{minutos:02d}:{segundos:02d}"
+
+            resultados_spotify.append({
+                'titulo': item['name'],
+                'artista': item['artists'][0]['name'],
+                'duracao': duracao_formatada,
+                'capa': item['album']['images'][0]['url'] if item['album']['images'] else '',
+                'album': item['album']['name'],
+                'link_spotify': item['external_urls'].get('spotify', '') # URL oficial da faixa
+            })
+
     cursor.execute('SELECT * FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
     albuns = cursor.fetchall()
 
@@ -581,7 +649,8 @@ def musico_cadastrar_musica(musico_id):
         'cadastrar_musica.html',
         musico_id=musico_id,
         albuns=albuns,
-        generos=generos
+        generos=generos,
+        resultados_spotify=resultados_spotify
     )
 
 
@@ -716,6 +785,7 @@ def musico_excluir_musica(musico_id, id_musica):
     return redirect(url_for('musico_listar_musicas', musico_id=musico_id))
 
 
+
 @app.route('/musico/musicas/editar/<int:musico_id>/<int:id_musica>', methods=['GET', 'POST'])
 def atualizar_musico(musico_id, id_musica):
     conexao = criar_conexao()
@@ -753,6 +823,8 @@ def atualizar_musico(musico_id, id_musica):
     conexao.close()
 
     return render_template('editar_musica.html', musica=musica, generos=generos, albuns=albuns, musico_id=musico_id)
+
+
 
 
 @app.route('/login/usuario', methods=['GET', 'POST'])

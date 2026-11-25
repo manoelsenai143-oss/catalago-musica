@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Pesquisa Spotify</title>
+    <!-- Podes usar o teu CSS habitual do painel aqui -->
+</head>
+<body style="background: #121212; color: #fff; padding: 30px; font-family: Arial;">
+    <h2>Pesquisar Músicas no Spotify</h2>
+
+    <!-- Formulário de Pesquisa -->
+    <form method="POST">
+        <input type="text" name="termo" placeholder="Nome da música..." required style="padding: 8px; width: 300px;">
+        <button type="submit" style="padding: 8px 15px; background: #1db954; color: #fff; border: none; font-weight: bold;">Pesquisar</button>
+    </form>
+
+    <br>
+
+    <!-- Tabela com os Resultados -->
+    {% if resultados %}
+        <table border="1" style="width: 100%; border-collapse: collapse; border-color: #333;">
+            <tr style="background: #222;">
+                <th>Capa</th>
+                <th>Música / Artista</th>
+                <th>Álbum</th>
+                <th>Ação</th>
+            </tr>
+            {% for r in resultados %}
+            <tr>
+                <td><img src="{{ r.capa }}" width="50" style="border-radius: 4px;"></td>
+                <td><strong>{{ r.titulo }}</strong><br><small style="color: #aaa;">{{ r.artista }}</small></td>
+                <td>{{ r.album }}</td>
+                <td>
+                    <!-- Link para abrir no Spotify -->
+                    <a href="{{ r.link_spotify }}" target="_blank" style="color: #1db954; font-weight: bold; text-decoration: none;">
+                        Ouvir 🎧
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('admin_home') }}" style="color: #aaa;">← Voltar ao Painel</a>
+</body>
+</html>

@@ -40,6 +40,45 @@
                     </div>
                 </div>
 
+                <!-- 🎧 SEÇÃO DE PESQUISA DO SPOTIFY -->
+                <div style="background: #222; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #333;">
+                    <form method="GET" action="{{ url_for('musico_cadastrar_musica', musico_id=musico_id) }}" style="display: flex; gap: 10px; align-items: center;">
+                        <div class="input-field" style="flex: 1; margin: 0;">
+                            <i class="material-icons prefix" style="color: #1db954;">headset</i>
+                            <input type="text" id="busca_spotify" name="busca_spotify" value="{{ request.args.get('busca_spotify', '') }}" class="white-text" placeholder="Pesquisar música no Spotify..." style="margin: 0;">
+                        </div>
+                        <button type="submit" class="btn waves-effect waves-light" style="background-color: #1db954; height: 45px; line-height: 45px;">
+                            <i class="material-icons left">search</i> Buscar
+                        </button>
+                    </form>
+
+                    {% if resultados_spotify %}
+                    <div style="margin-top: 15px; max-height: 200px; overflow-y: auto;">
+                        <p style="color: #1db954; font-size: 0.9rem; margin-bottom: 10px;">Clique em "Usar" para preencher automaticamente:</p>
+                        <ul class="collection" style="border: none; margin: 0;">
+                            {% for track in resultados_spotify %}
+                            <li class="collection-item" style="background: #2a2a2a; color: #fff; border-color: #383838; display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    {% if track.capa %}
+                                    <img src="{{ track.capa }}" alt="Capa" style="width: 40px; height: 40px; border-radius: 4px;">
+                                    {% endif %}
+                                    <div>
+                                        <span style="font-weight: bold; display: block;">{{ track.titulo }}</span>
+                                        <small style="color: #1db954; display: block;">Álbum: {{ track.album }}</small>
+                                        <small style="color: #aaa;">{{ track.artista }} • ⏱️ {{ track.duracao }}</small>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-small waves-effect" style="background-color: #1db954;" onclick="preencherSpotify('{{ track.titulo }}', '{{ track.duracao }}', '{{ track.album }}', '{{ track.capa }}', '{{ track.link_spotify }}')">
+                                    Usar
+                                </button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                <!-- FIM DA SEÇÃO SPOTIFY -->
+
                 {% if erro %}
                 <div id="erro-msg" data-erro="{{ erro }}" class="mensagem-erro">
                     <i class="material-icons tiny">error_outline</i>
@@ -48,6 +87,10 @@
                 {% endif %}
 
                 <form method="POST" id="form-musica" novalidate>
+                    <!-- Campos ocultos para enviar dados do Spotify para o backend -->
+                    <input type="hidden" id="album_spotify" name="album_spotify" value="">
+                    <input type="hidden" id="capa_url" name="capa_url" value="">
+                    <input type="hidden" id="spotify_url" name="spotify_url" value="">
 
                     <!-- Título -->
                     <div class="input-field">
@@ -81,7 +124,7 @@
                     <div class="input-field">
                         <i class="material-icons prefix">album</i>
                         <select name="id_album" id="id_album">
-                            <option value="" selected>— Single (Sem Álbum) —</option>
+                            <option value="" id="opcao-padrao-album" selected>— Single (Sem Álbum) —</option>
                             {% for album in albuns %}
                                 <option value="{{ album.id_album }}">{{ album.nome_album }}</option>
                             {% endfor %}
@@ -148,12 +191,10 @@
             document.getElementById('form-musica').addEventListener('submit', (e) => {
                 let valido = true;
 
-                // Campos .validate normais
                 e.target.querySelectorAll('.validate').forEach(c => {
                     if (!c.validity.valid) valido = false;
                 });
 
-                // Select de género — o Materialize esconde o <select> real
                 const genero = document.getElementById('id_genero');
                 const helperGenero = document.getElementById('helper-genero');
                 if (genero.value === '') {
@@ -172,7 +213,6 @@
                 }
             });
 
-            // Limpa o erro do género assim que o user escolhe
             document.getElementById('id_genero').addEventListener('change', (e) => {
                 if (e.target.value !== '') {
                     document.getElementById('helper-genero').textContent = '';
@@ -182,10 +222,56 @@
 
         // Máscara de duração: "0345" → "03:45"
         function mascaraDuracao(input) {
-            let v = input.value.replace(/\D/g, '');      // só números
-            if (v.length > 4) v = v.slice(0, 4);         // máx 4 dígitos
+            let v = input.value.replace(/\D/g, '');
+            if (v.length > 4) v = v.slice(0, 4);
             if (v.length > 2) v = v.slice(0, 2) + ':' + v.slice(2);
             input.value = v;
+        }
+
+        // Função JS atualizada para recolher capa e link do Spotify
+        function preencherSpotify(titulo, duracao, nomeAlbum, capaUrl, spotifyUrl) {
+            document.getElementById('titulo').value = titulo;
+            document.getElementById('duracao').value = duracao;
+            document.getElementById('album_spotify').value = nomeAlbum || '';
+            document.getElementById('capa_url').value = capaUrl || '';
+            document.getElementById('spotify_url').value = spotifyUrl || '';
+
+            const selectAlbum = document.getElementById('id_album');
+            const opcaoPadrao = document.getElementById('opcao-padrao-album');
+            let albumEncontrado = false;
+
+            if (nomeAlbum) {
+                let nomeSpotifyLimpo = nomeAlbum.trim().toLowerCase();
+
+                for (let i = 1; i < selectAlbum.options.length; i++) {
+                    let nomeBdLimpo = selectAlbum.options[i].text.trim().toLowerCase();
+
+                    if (nomeBdLimpo && (nomeSpotifyLimpo.includes(nomeBdLimpo) || nomeBdLimpo.includes(nomeSpotifyLimpo))) {
+                        selectAlbum.selectedIndex = i;
+                        albumEncontrado = true;
+                        break;
+                    }
+                }
+            }
+
+            if (albumEncontrado) {
+                opcaoPadrao.text = '— Single (Sem Álbum) —';
+            } else {
+                selectAlbum.selectedIndex = 0;
+                if (nomeAlbum && nomeAlbum.trim() !== '') {
+                    opcaoPadrao.text = `✨ Criar Álbum do Spotify: ${nomeAlbum}`;
+                } else {
+                    opcaoPadrao.text = '— Single (Sem Álbum) —';
+                }
+            }
+
+            M.updateTextFields();
+            M.FormSelect.init(selectAlbum);
+
+            M.toast({
+                html: '<i class="material-icons tiny">check</i> Dados e Capa importados do Spotify!',
+                classes: 'green darken-2 rounded'
+            });
         }
     </script>
 </body>
