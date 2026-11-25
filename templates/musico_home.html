@@ -2,71 +2,137 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Músico</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Materialize CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- CSS específico desta página -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='musico_home.css') }}">
 </head>
-<body style="background-color: #121212; color: #fff; margin: 0; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden;">
+<body>
 
-    <!-- BARRA LATERAL (SIDEBAR) -->
-    <div style="width: 240px; background-color: #000; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; border-right: 1px solid #222;">
-
-        <div>
-            <!-- Título do Sistema -->
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px; color: #1db954; font-weight: bold; font-size: 1.2rem;">
-                🎵 Sistema
-            </div>
-
-            <!-- Links de Navegação -->
-            <nav style="display: flex; flex-direction: column; gap: 15px;">
-                <a href="{{ url_for('musico_home', musico_id=musico_id) }}" style="color: #fff; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
-                    🏠 Início
-                </a>
-                <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
-                    🎶 Músicas
-                </a>
-                <!-- ADICIONADO: Link para Álbuns -->
-                <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
-                    💿 Álbuns
-                </a>
-            </nav>
-        </div>
-
-        <!-- Botão de Sair / Terminar Sessão -->
-        <div>
-            <a href="{{ url_for('logout') }}" style="color: #e74c3c; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                🚪 Terminar Sessão
+    <!-- Topbar (só mobile) -->
+    <nav class="topbar hide-on-large-only">
+        <div class="nav-wrapper">
+            <a href="#" data-target="slide-out" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
             </a>
+            <span class="brand-text">Painel do Músico</span>
         </div>
-    </div>
+    </nav>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div style="flex: 1; padding: 40px; overflow-y: auto; background-color: #121212;">
+    <!-- Sidebar -->
+    <ul id="slide-out" class="sidenav sidenav-fixed dark-sidenav">
+        <li>
+            <div class="user-view">
+                <div class="brand">
+                    <i class="material-icons medium">music_note</i>
+                    <h5>Sistema</h5>
+                </div>
+            </div>
+        </li>
 
-        <h1 style="font-size: 2rem; margin-bottom: 10px; color: #fff;">Bem-vindo ao seu Painel!</h1>
-        <p style="color: #b3b3b3; margin-bottom: 30px;">Gerencie as suas músicas, álbuns e playlists favoritas por aqui[cite: 1].</p>
+        <li>
+            <a href="{{ url_for('musico_home', musico_id=musico_id) }}"
+               class="waves-effect nav-link active">
+                <i class="material-icons">home</i>
+                Início
+            </a>
+        </li>
 
-        <!-- Cartões de Resumo -->
-        <div style="display: flex; gap: 20px;">
+        <li>
+            <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}"
+               class="waves-effect nav-link">
+                <i class="material-icons">library_music</i>
+                Músicas
+            </a>
+        </li>
 
-            <!-- ADICIONADO: Cartão de Álbuns -->
-            <div style="background-color: #181818; border-radius: 8px; padding: 20px; width: 250px; border-left: 4px solid #9b59b6; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                <p style="color: #b3b3b3; margin: 0 0 10px 0; font-size: 0.9rem;">Os seus Álbuns</p>
-                <h2 style="margin: 0; font-size: 1.2rem; color: #9b59b6;">
-                    <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}" style="color: #9b59b6; text-decoration: none;">Gerenciar</a>
-                </h2>
+        <li>
+            <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}"
+               class="waves-effect nav-link">
+                <i class="material-icons">album</i>
+                Álbuns
+            </a>
+        </li>
+
+        <li><div class="divider"></div></li>
+
+        <li>
+            <a href="{{ url_for('logout') }}"
+               class="waves-effect botao-sair">
+                <i class="material-icons">logout</i>
+                Terminar Sessão
+            </a>
+        </li>
+    </ul>
+
+    <!-- Conteúdo principal -->
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="welcome-block">
+                <h1 class="titulo">
+                    <i class="material-icons medium">waving_hand</i>
+                    Bem-vindo ao seu Painel!
+                </h1>
+                <p class="subtitulo">
+                    Gerencie as suas músicas, álbuns e playlists favoritas por aqui.
+                </p>
             </div>
 
-            <!-- Cartão Músicas / Ações Rápidas -->
-            <div style="background-color: #181818; border-radius: 8px; padding: 20px; width: 250px; border-left: 4px solid #f39c12; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                <p style="color: #b3b3b3; margin: 0 0 10px 0; font-size: 0.9rem;">Ações Rápidas</p>
-                <h2 style="margin: 0; font-size: 1.2rem; color: #f39c12;">
-                    <a href="{{ url_for('musico_cadastrar_musica', musico_id=musico_id) }}" style="color: #f39c12; text-decoration: none;">+ Nova Música</a>
-                </h2>
+            <!-- Cartões de resumo -->
+            <div class="row cards-row">
+
+                <!-- Álbuns -->
+                <div class="col s12 m6">
+                    <div class="card dark-card resumo-card z-depth-2">
+                        <div class="card-content">
+                            <div class="resumo-top">
+                                <i class="material-icons medium resumo-icon">album</i>
+                                <p class="resumo-label">Os seus Álbuns</p>
+                            </div>
+                            <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}"
+                               class="btn-large waves-effect waves-light btn-resumo">
+                                <i class="material-icons left">folder_open</i>
+                                Gerenciar Álbuns
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nova Música -->
+                <div class="col s12 m6">
+                    <div class="card dark-card resumo-card z-depth-2">
+                        <div class="card-content">
+                            <div class="resumo-top">
+                                <i class="material-icons medium resumo-icon">library_music</i>
+                                <p class="resumo-label">Ações Rápidas</p>
+                            </div>
+                            <a href="{{ url_for('musico_cadastrar_musica', musico_id=musico_id) }}"
+                               class="btn-large waves-effect waves-light btn-resumo">
+                                <i class="material-icons left">add</i>
+                                Nova Música
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         </div>
+    </main>
 
-    </div>
-
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            M.Sidenav.init(document.querySelectorAll('.sidenav'), { edge: 'left' });
+        });
+    </script>
 </body>
 </html>

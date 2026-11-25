@@ -2,62 +2,91 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Músicas</title>
 
-    <!-- 1. Importar CSS do DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- Materialize CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- CSS específico desta página -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='buscar_musica.css') }}">
 </head>
-<body style="padding: 20px; font-family: Arial, sans-serif;">
+<body>
 
-    <!-- Botão para voltar às playlists -->
-    <div style="margin-bottom: 20px;">
-        <a href="{{ url_for('usuario_home', usuario_id=usuario_id) }}" style="text-decoration: none; color: #007bff; font-weight: bold;">
-            ← Voltar para o painel
-        </a>
+    <div class="page-container">
+
+        <!-- Cabeçalho com botão voltar + título -->
+        <div class="page-header">
+            <a href="{{ url_for('usuario_home', usuario_id=usuario_id) }}"
+               class="btn-flat waves-effect btn-voltar">
+                <i class="material-icons left">arrow_back</i>
+                Voltar ao painel
+            </a>
+
+            <h4 class="titulo">
+                <i class="material-icons medium">library_music</i>
+                Catálogo de Músicas
+            </h4>
+        </div>
+
+        <!-- Card com a tabela -->
+        <div class="card dark-card z-depth-2">
+            <div class="card-content">
+
+                <table id="tabelaMusicas" class="display nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Duração</th>
+                            <th>Artista</th>
+                            <th>Álbum</th>
+                            <th>Género</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for musica in musicas %}
+                        <tr>
+                            <td>{{ musica.id }}</td>
+                            <td>{{ musica.titulo }}</td>
+                            <td>{{ musica.duracao }}</td>
+                            <td>{{ musica.artista if musica.artista else 'N/A' }}</td>
+                            <td>{{ musica.album if musica.album else 'N/A' }}</td>
+                            <td>{{ musica.genero }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
     </div>
 
-    <h2>Catálogo de Músicas</h2>
-
-    <!-- A tua tabela de músicas -->
-    <table id="tabelaMusicas" class="display" style="width:100%">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Título</th>
-                <th>Duração</th>
-                <th>Artista</th>
-                <th>Álbum</th>
-                <th>Género</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for musica in musicas %}
-            <tr>
-                <td>{{ musica.id }}</td>
-                <td>{{ musica.titulo }}</td>
-                <td>{{ musica.duracao }}</td>
-                <td>{{ musica.artista if musica.artista else 'N/A' }}</td>
-                <td>{{ musica.album if musica.album else 'N/A' }}</td>
-                <td>{{ musica.genero }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <!-- 2. Importar jQuery e o JS do DataTables -->
+    <!-- jQuery + DataTables -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-    <!-- 3. Ativar o DataTables na tabela -->
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <!-- Ativação do DataTables -->
     <script>
         $(document).ready(function() {
             $('#tabelaMusicas').DataTable({
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json" // Traduz para português
-                }
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json"
+                },
+                "pageLength": 10,
+                "order": [[0, 'asc']],
+                "responsive": true
             });
         });
     </script>
-
 </body>
 </html>

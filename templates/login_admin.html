@@ -2,30 +2,137 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Administrador</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Materialize CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- CSS específico desta página -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='login_admin.css') }}">
 </head>
-<body style="background-color: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
-    <div style="background-color: #181818; padding: 40px; border-radius: 10px; width: 350px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-        <h2 style="color: #e74c3c; margin-bottom: 20px;">🔒 Painel Admin</h2>
-        
-        <!-- Mensagem de erro caso o login falhe -->
-        {% if erro %}
-            <p style="color: #e74c3c; background-color: rgba(231, 76, 60, 0.1); padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 15px; font-size: 0.9rem;">{{ erro }}</p>
-        {% endif %}
+<body>
 
-        <!-- O action aponta explicitamente para a rota do admin no Flask -->
-        <form action="{{ url_for('login_admin_page') }}" method="POST">
-            <label style="display: block; margin-bottom: 5px;">Utilizador:</label>
-            <input type="text" name="usuario" placeholder="admin" required style="width: 100%; padding: 10px; margin-bottom: 15px; background: #333; border: none; color: #fff; border-radius: 5px;">
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m8 offset-m2 l6 offset-l3">
 
-            <label style="display: block; margin-bottom: 5px;">Senha:</label>
-            <input type="password" name="senha" placeholder="********" required style="width: 100%; padding: 10px; margin-bottom: 20px; background: #333; border: none; color: #fff; border-radius: 5px;">
+                <div class="card dark-card z-depth-3">
+                    <div class="card-content">
 
-            <button type="submit" style="width: 100%; padding: 10px; background-color: #e74c3c; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Entrar como Admin</button>
-        </form>
+                        <h4 class="center-align white-text">
+                            <i class="material-icons medium">admin_panel_settings</i>
+                            <br>
+                            Painel Admin
+                        </h4>
 
-        <p style="margin-top: 20px; text-align: center;"><a href="{{ url_for('pagina_escolha_login') }}" style="color: #b3b3b3; text-decoration: none;">← Voltar ao Início</a></p>
+                        {% if erro %}
+                        <div id="erro-msg" data-erro="{{ erro }}" class="mensagem-erro">
+                            <i class="material-icons tiny">error_outline</i>
+                            {{ erro }}
+                        </div>
+                        {% endif %}
+
+                        <form action="{{ url_for('login_admin_page') }}"
+                              method="POST" id="form-admin" novalidate>
+
+                            <!-- Utilizador -->
+                            <div class="input-field">
+                                <i class="material-icons prefix">person</i>
+                                <input type="text" id="usuario" name="usuario"
+                                       class="validate" required minlength="3"
+                                       autocomplete="username"
+                                       placeholder="admin">
+                                <label for="usuario" class="active">Utilizador</label>
+                                <span class="helper-text"
+                                      data-error="Mínimo 3 caracteres"
+                                      data-success=""></span>
+                            </div>
+
+                            <!-- Senha -->
+                            <div class="input-field">
+                                <i class="material-icons prefix">lock</i>
+                                <input type="password" id="senha" name="senha"
+                                       class="validate" required minlength="6"
+                                       autocomplete="current-password"
+                                       placeholder="********">
+                                <label for="senha" class="active">Senha</label>
+                                <span class="helper-text"
+                                      data-error="Mínimo 6 caracteres"
+                                      data-success=""></span>
+                                <i class="material-icons toggle-password"
+                                   data-target="senha"
+                                   title="Mostrar / ocultar senha">visibility</i>
+                            </div>
+
+                            <!-- Botão -->
+                            <button type="submit"
+                                    class="btn-large waves-effect waves-light btn-login">
+                                Entrar como Admin
+                                <i class="material-icons right">shield</i>
+                            </button>
+
+                        </form>
+
+                        <div class="divider"></div>
+
+                        <p class="center-align link-voltar">
+                            <a href="{{ url_for('pagina_escolha_login') }}"
+                               class="link-cinza waves-effect">
+                                <i class="material-icons tiny left">arrow_back</i>
+                                Voltar ao Início
+                            </a>
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        // 1) Corrige labels quando o browser faz autofill
+        M.updateTextFields();
+
+        // 2) Mostrar / ocultar senha
+        document.querySelectorAll('.toggle-password').forEach(icon => {
+            icon.addEventListener('click', () => {
+                const input = document.getElementById(icon.dataset.target);
+                const hidden = input.type === 'password';
+                input.type = hidden ? 'text' : 'password';
+                icon.textContent = hidden ? 'visibility_off' : 'visibility';
+            });
+        });
+
+        // 3) Toast com a mensagem de erro vinda do Flask
+        const erroDiv = document.getElementById('erro-msg');
+        if (erroDiv) {
+            M.toast({
+                html: '<i class="material-icons tiny">error_outline</i> ' + erroDiv.dataset.erro,
+                classes: 'red darken-2 rounded',
+                displayLength: 5000
+            });
+        }
+
+        // 4) Validação antes do submit
+        document.getElementById('form-admin').addEventListener('submit', (e) => {
+            const campos = e.target.querySelectorAll('.validate');
+            let valido = true;
+            campos.forEach(c => { if (!c.validity.valid) valido = false; });
+
+            if (!valido) {
+                e.preventDefault();
+                M.toast({
+                    html: '<i class="material-icons tiny">warning</i> Corrija os campos destacados',
+                    classes: 'orange darken-3 rounded'
+                });
+            }
+        });
+    </script>
 </body>
 </html>

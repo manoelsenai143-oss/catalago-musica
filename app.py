@@ -1,7 +1,12 @@
-from flask import Flask, jsonify, request, render_template, redirect, url_for
+from flask import Flask, jsonify, request, render_template, redirect, url_for, send_file
 from psycopg2.extras import RealDictCursor
 from database import criar_conexao
 from psycopg2.errors import UniqueViolation
+from create_pdf_albuns import criar_pdf_albuns
+from create_pdf_generos import criar_pdf_generos
+from create_pdf_musicas_geral import criar_pdf_musicas_geral
+from create_pdf_musicos import criar_pdf_musicos
+from create_pdf_usuarios import criar_pdf_usuarios
 
 
 app = Flask(__name__)
@@ -14,6 +19,120 @@ def pagina_escolha_login():
 @app.route('/logout')
 def logout():
     return redirect('/')
+
+@app.route('/exportar-albuns-pdf')
+def exportar_albuns_pdf():
+    # 1. Vai buscar os dados dos álbuns à base de dados PostgreSQL
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+    cursor.execute("""
+        SELECT a.id_album, a.nome_album, ar.nome_artista AS artista, a.ano_album 
+        FROM "ALBUM" a 
+        JOIN "ARTISTA" ar ON a.id_artista = ar.id_artista
+    """)
+    albuns = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    # 2. Chama a função que gera o PDF (certifica-te de ter uma função para álbuns)
+    arquivo_pdf = criar_pdf_albuns(albuns)
+
+    # 3. Envia o ficheiro PDF gerado para download no navegador
+    return send_file(
+        arquivo_pdf,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name='relatorio_albuns.pdf'
+    )
+
+@app.route('/exportar-generos-pdf')
+def exportar_generos_pdf():
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+    cursor.execute('SELECT id_genero, nome_genero FROM "GENERO" ORDER BY id_genero ASC')
+    generos = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    arquivo_pdf = criar_pdf_generos(generos)
+
+    return send_file(
+        arquivo_pdf,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name='relatorio_generos.pdf'
+    )
+
+@app.route('/exportar-musicas-geral-pdf')
+def exportar_musicas_geral_pdf():
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+    cursor.execute("""
+        SELECT 
+            m.id_musica AS id,
+            m.titulo,
+            m."duração" AS duracao,
+            COALESCE(art.nome_artista, art_direto.nome_artista, mus.nome, 'Desconhecido') AS artista,
+            COALESCE(al.nome_album, 'Sem Álbum') AS album,
+            g.nome_genero AS genero
+        FROM "MUSICA" m
+        LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
+        LEFT JOIN "ARTISTA" art ON al.id_artista = art.id_artista
+        LEFT JOIN "ARTISTA" art_direto ON m.id_artista = art_direto.id_artista
+        LEFT JOIN musicos mus ON m.id_artista = mus.id
+        JOIN "GENERO" g ON m.id_genero = g.id_genero
+        ORDER BY m.id_musica ASC
+    """)
+    musicas = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    arquivo_pdf = criar_pdf_musicas_geral(musicas)
+
+    return send_file(
+        arquivo_pdf,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name='relatorio_musicas_geral.pdf'
+    )
+
+@app.route('/exportar-musicos-pdf')
+def exportar_musicos_pdf():
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+    cursor.execute('SELECT id, nome, cpf FROM musicos ORDER BY id ASC')
+    musicos = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    arquivo_pdf = criar_pdf_musicos(musicos)
+
+    return send_file(
+        arquivo_pdf,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name='relatorio_musicos.pdf'
+    )
+
+
+@app.route('/exportar-usuarios-pdf')
+def exportar_usuarios_pdf():
+    conexao = criar_conexao()
+    cursor = conexao.cursor(cursor_factory=RealDictCursor)
+    cursor.execute('SELECT id, nome_usuario, email FROM "USUARIO" ORDER BY id ASC')
+    usuarios = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+
+    arquivo_pdf = criar_pdf_usuarios(usuarios)
+
+    return send_file(
+        arquivo_pdf,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name='relatorio_usuarios.pdf'
+    )
+
 
 
 @app.route('/login/admin', methods=['GET', 'POST'])

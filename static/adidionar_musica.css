@@ -1,0 +1,345 @@
+:root {
+    --bg-body:     #121212;
+    --bg-card:     #1e1e1e;
+    --bg-input:    #2a2a2a;
+    --text-main:   #ffffff;
+    --text-mute:   #b0b0b0;
+    --border:      #2f2f2f;
+
+    --accent:      #6200ee;
+    --accent-hv:   #7c3aed;
+    --accent-glow: rgba(98, 0, 238, .28);
+    --accent-soft: rgba(98, 0, 238, .15);
+
+    --err:         #ef5350;
+    --ok:          #4caf50;
+
+    --radius-sm:   6px;
+    --radius-md:   8px;
+    --radius-lg:   10px;
+    --radius-xl:   14px;
+}
+
+body {
+    margin: 0;
+    padding: 24px;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color-scheme: dark;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+
+.page-container {
+    width: 100%;
+    max-width: 620px;
+}
+
+.page-header { margin-bottom: 20px; }
+
+.btn-voltar {
+    color: var(--text-mute) !important;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    text-transform: none;
+    padding: 0 14px;
+    height: 40px;
+    line-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    transition: background .2s ease, color .2s ease;
+}
+.btn-voltar:hover {
+    background-color: var(--accent-soft) !important;
+    color: var(--accent) !important;
+}
+.btn-voltar .material-icons.left {
+    margin-right: 6px;
+    font-size: 20px;
+}
+
+/* ============================================================
+   ===== CARD =================================================
+   ============================================================ */
+.dark-card {
+    background-color: var(--bg-card) !important;
+    border-radius: var(--radius-xl) !important;
+    margin: 0;
+    box-shadow:
+        0 1px 2px rgba(0,0,0,.4),
+        0 12px 32px rgba(0,0,0,.6) !important;
+}
+.dark-card .card-content {
+    padding: 36px 32px 28px !important;
+}
+
+/* ============================================================
+   ===== HEADER DO FORM (ícone + título lado a lado) ==========
+   ============================================================ */
+.form-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.form-header-icon {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hv) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px var(--accent-glow);
+}
+.form-header-icon .material-icons {
+    color: #ffffff;
+    font-size: 28px;
+}
+
+.form-header-text h4 {
+    margin: 0 0 4px;
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+.form-header-text p {
+    margin: 0;
+    color: var(--text-mute);
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+/* ============================================================
+   ===== MENSAGEM DE ERRO =====================================
+   ============================================================ */
+.mensagem-erro {
+    background-color: rgba(239, 83, 80, 0.12);
+    color: var(--err);
+    padding: 12px 16px;
+    border-radius: var(--radius-lg);
+    border-left: 3px solid var(--err);
+    font-size: 0.9rem;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.mensagem-erro .material-icons.tiny {
+    font-size: 18px;
+}
+
+/* ============================================================
+   ===== INPUTS Materialize em dark ===========================
+   ============================================================ */
+.input-field {
+    margin-top: 4px;
+    margin-bottom: 22px;
+}
+
+.input-field input {
+    color: var(--text-main) !important;
+    border-bottom: 1px solid #555 !important;
+    caret-color: var(--accent);
+    font-family: inherit;
+    font-size: 1rem;
+}
+.input-field input:focus {
+    border-bottom: 1px solid var(--accent) !important;
+    box-shadow: 0 1px 0 0 var(--accent) !important;
+}
+.input-field input:focus + label {
+    color: var(--accent) !important;
+}
+.input-field label         { color: var(--text-mute) !important; font-size: 0.95rem; }
+.input-field label.active  { color: var(--accent) !important; }
+.input-field .prefix       { color: #666; transition: color .2s ease; }
+.input-field .prefix.active{ color: var(--accent) !important; }
+
+/* Validação */
+.input-field input.valid   { border-bottom-color: var(--ok)  !important; }
+.input-field input.invalid { border-bottom-color: var(--err) !important; }
+.input-field .helper-text  {
+    color: var(--err) !important;
+    min-height: 18px;
+    font-size: 0.8rem;
+    margin-top: 2px;
+}
+
+/* ============================================================
+   ===== SELECTS Materialize em dark ==========================
+   ============================================================ */
+.input-field .select-wrapper input.select-dropdown {
+    color: var(--text-main) !important;
+    border-bottom: 1px solid #555 !important;
+    font-family: inherit;
+    font-size: 1rem;
+}
+.input-field .select-wrapper input.select-dropdown:focus {
+    border-bottom: 1px solid var(--accent) !important;
+    box-shadow: 0 1px 0 0 var(--accent) !important;
+}
+
+/* Seta do dropdown */
+.input-field .select-wrapper .caret {
+    fill: var(--text-mute);
+    transition: fill .2s ease;
+}
+.input-field .select-wrapper input.select-dropdown:focus + .caret,
+.input-field .select-wrapper:hover .caret {
+    fill: var(--accent);
+}
+
+/* Dropdown aberto */
+.dropdown-content {
+    background-color: var(--bg-input) !important;
+    border-radius: var(--radius-md);
+    box-shadow: 0 6px 20px rgba(0,0,0,.6) !important;
+    border: 1px solid var(--border);
+}
+.dropdown-content li > span,
+.dropdown-content li > a {
+    color: var(--text-main) !important;
+    font-size: 0.95rem;
+    padding: 12px 18px;
+    transition: background .2s ease, color .2s ease;
+}
+.dropdown-content li:hover,
+.dropdown-content li.active,
+.dropdown-content li.selected {
+    background-color: var(--accent-soft) !important;
+}
+.dropdown-content li:hover > span,
+.dropdown-content li:hover > a,
+.dropdown-content li.active > span,
+.dropdown-content li.active > a,
+.dropdown-content li.selected > span,
+.dropdown-content li.selected > a {
+    color: var(--accent) !important;
+    font-weight: 600;
+}
+.dropdown-content li.disabled > span {
+    color: #555 !important;
+}
+
+/* Label do select quando ativo */
+.input-field .select-wrapper + label.active {
+    color: var(--accent) !important;
+}
+
+/* Helper do género (erro custom) */
+.helper-genero:empty {
+    display: none;
+}
+
+/* ============================================================
+   ===== AÇÕES DO FORM (Cancelar + Guardar) ==================
+   ============================================================ */
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.btn-cancelar {
+    color: var(--text-mute) !important;
+    border-radius: var(--radius-lg) !important;
+    font-weight: 500;
+    text-transform: none;
+    height: 44px;
+    line-height: 44px;
+    padding: 0 20px;
+    transition: background .2s ease, color .2s ease;
+}
+.btn-cancelar:hover {
+    background-color: rgba(255,255,255,.05) !important;
+    color: var(--text-main) !important;
+}
+
+.btn-guardar {
+    background-color: var(--accent) !important;
+    color: #ffffff !important;
+    border-radius: var(--radius-lg) !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: none;
+    height: 44px !important;
+    line-height: 44px !important;
+    padding: 0 22px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 1px 2px rgba(0,0,0,.4),
+        0 4px 14px var(--accent-glow) !important;
+    transition: background .2s ease, box-shadow .2s ease, transform .1s ease;
+}
+.btn-guardar:hover {
+    background-color: var(--accent-hv) !important;
+    box-shadow:
+        0 2px 4px rgba(0,0,0,.4),
+        0 8px 24px var(--accent-glow) !important;
+}
+.btn-guardar:active {
+    transform: translateY(1px);
+}
+.btn-guardar .material-icons.left {
+    margin-right: 8px;
+    margin-left: 0;
+    font-size: 20px;
+    color: #ffffff;
+}
+
+/* ============================================================
+   ===== TOAST ================================================
+   ============================================================ */
+.toast.rounded { border-radius: 30px; }
+
+/* ============================================================
+   ===== ACESSIBILIDADE =======================================
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+}
+
+/* ============================================================
+   ===== RESPONSIVO ===========================================
+   ============================================================ */
+@media (max-width: 600px) {
+    body { padding: 16px; }
+    .dark-card .card-content { padding: 24px 20px 20px !important; }
+
+    .form-header {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        gap: 12px;
+        padding-bottom: 20px;
+        margin-bottom: 22px;
+    }
+    .form-header-icon { width: 48px; height: 48px; border-radius: 12px; }
+    .form-header-icon .material-icons { font-size: 24px; }
+    .form-header-text h4 { font-size: 1.15rem; }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+    .btn-cancelar,
+    .btn-guardar {
+        width: 100%;
+        justify-content: center;
+    }
+}

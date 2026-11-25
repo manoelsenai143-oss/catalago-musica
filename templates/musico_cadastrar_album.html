@@ -1,37 +1,124 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastrar Álbum</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cadastrar Álbum - Painel do Músico</title>
+
+    <!-- MATERIALIZE CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- MATERIAL ICONS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+
+    <!-- CSS PRÓPRIO -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='cadastrar_album.css') }}">
 </head>
-<body style="background-color: #121212; color: #fff; margin: 0; font-family: sans-serif; display: flex; height: 100vh; justify-content: center; align-items: center;">
 
-    <div style="background-color: #181818; padding: 30px; border-radius: 8px; width: 400px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 1px solid #282828;">
-        
-        <h2 style="margin-top: 0; color: #1db954; font-size: 1.5rem; margin-bottom: 20px;">💿 Novo Álbum</h2>
+<body>
 
-        <form action="{{ url_for('musico_cadastrar_album', musico_id=musico_id) }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
-            
-            <div>
-                <label style="display: block; margin-bottom: 5px; color: #b3b3b3; font-size: 0.9rem;">Nome do Álbum:</label>
-                <input type="text" name="nome_album" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #333; background: #222; color: #fff; box-sizing: border-box;">
-            </div>
+    <main class="pagina">
 
-            <div>
-                <label style="display: block; margin-bottom: 5px; color: #b3b3b3; font-size: 0.9rem;">Ano do Álbum:</label>
-                <input type="number" name="ano_album" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #333; background: #222; color: #fff; box-sizing: border-box;">
-            </div>
+        <div class="card-cadastro">
 
-            <button type="submit" style="padding: 12px; background-color: #1db954; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px;">
-                Criar Álbum
-            </button>
-        </form>
+            <!-- CABEÇALHO -->
+            <header class="cabecalho">
 
-        <div style="margin-top: 20px; text-align: center;">
-            <a href="{{ url_for('musico_home', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-size: 0.9rem;">← Voltar ao Início</a>
+                <div class="icone-titulo">
+                    <i class="material-icons">album</i>
+                </div>
+
+                <div>
+                    <h4>Novo Álbum</h4>
+                    <p>Cadastre um novo álbum no sistema</p>
+                </div>
+
+            </header>
+
+            <div class="divisor"></div>
+
+            <!-- FORMULÁRIO -->
+            <form action="{{ url_for('musico_cadastrar_album', musico_id=musico_id) }}"
+                  method="POST">
+
+                <!-- NOME DO ÁLBUM -->
+                <div class="campo-linha">
+
+                    <i class="material-icons icone-campo">album</i>
+
+                    <div class="campo-conteudo input-field">
+
+                        <input
+                            type="text"
+                            id="nome_album"
+                            name="nome_album"
+                            required
+                        >
+
+                        <label for="nome_album">Nome do Álbum</label>
+
+                    </div>
+
+                </div>
+
+                <!-- ANO DO ÁLBUM -->
+                <div class="campo-linha">
+
+                    <i class="material-icons icone-campo">calendar_today</i>
+
+                    <div class="campo-conteudo input-field">
+
+                        <input
+                            type="number"
+                            id="ano_album"
+                            name="ano_album"
+                            min="1900"
+                            max="2100"
+                            required
+                        >
+
+                        <label for="ano_album">Ano do Álbum</label>
+
+                    </div>
+
+                </div>
+
+                <div class="divisor divisor-final"></div>
+
+                <!-- BOTÕES -->
+                <div class="botoes">
+
+                    <a href="{{ url_for('musico_home', musico_id=musico_id) }}"
+                       class="btn-cancelar">
+
+                        Cancelar
+
+                    </a>
+
+                    <button type="submit" class="btn-salvar">
+
+                        <i class="material-icons">save</i>
+                        Criar Álbum
+
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
 
-    </div>
+    </main>
+
+    <!-- MATERIALIZE JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
 </body>
+</html>
+
 </html>

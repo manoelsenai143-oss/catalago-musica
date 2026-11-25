@@ -1,0 +1,462 @@
+
+/* CONFIGURAÇÕES GERAIS */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+}
+
+/* PÁGINA */
+.pagina {
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+/* PAINEL PRINCIPAL */
+.painel-generos {
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    padding: 35px;
+    background-color: #1f1f1f;
+    border-radius: 18px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+}
+
+/* CABEÇALHO */
+.cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 25px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #333333;
+}
+
+.titulo-pagina {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.icone-titulo {
+    width: 65px;
+    height: 65px;
+    min-width: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #7100ff, #862cff);
+    border-radius: 17px;
+}
+
+.icone-titulo i {
+    color: #ffffff;
+    font-size: 35px;
+}
+
+.titulo-pagina h1 {
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: bold;
+    margin: 0 0 8px;
+}
+
+.titulo-pagina p {
+    color: #b3b3b3;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* BOTÃO EXPORTAR */
+.btn-exportar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 45px;
+    padding: 0 18px;
+    background: linear-gradient(135deg, #7100ff, #862cff);
+    color: #ffffff;
+    border-radius: 9px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: 0.3s;
+}
+
+.btn-exportar i {
+    font-size: 20px;
+}
+
+.btn-exportar:hover {
+    background: linear-gradient(135deg, #862cff, #9b45ff);
+    color: #ffffff;
+    box-shadow: 0 5px 15px rgba(112, 0, 255, 0.3);
+}
+
+/* TÍTULOS DAS SEÇÕES */
+.titulo-secao {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.titulo-secao i {
+    color: #a66aff;
+    font-size: 25px;
+}
+
+.titulo-secao h2 {
+    color: #ffffff;
+    font-size: 19px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* CADASTRO */
+.secao-cadastro {
+    margin-bottom: 35px;
+}
+
+.form-genero {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* CAMPO DE GÊNERO */
+.campo-genero {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    height: 50px;
+    padding: 0 15px;
+    background-color: #292929;
+    border: 1px solid #444444;
+    border-radius: 9px;
+    transition: 0.3s;
+}
+
+.campo-genero:focus-within {
+    border-color: #862cff;
+}
+
+.campo-genero i {
+    color: #a66aff;
+    font-size: 23px;
+}
+
+.campo-genero input {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    font-size: 15px;
+}
+
+.campo-genero input:focus {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.campo-genero input::placeholder {
+    color: #888888;
+}
+
+/* BOTÃO ADICIONAR */
+.btn-adicionar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 50px;
+    padding: 0 22px;
+    background: linear-gradient(135deg, #7100ff, #862cff);
+    color: #ffffff;
+    border: none;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-adicionar i {
+    font-size: 20px;
+}
+
+.btn-adicionar:hover {
+    background: linear-gradient(135deg, #862cff, #9b45ff);
+}
+
+/* TABELA */
+.secao-tabela {
+    margin-top: 10px;
+}
+
+.tabela-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#tabelaGeneros {
+    width: 100% !important;
+    table-layout: fixed;
+    border-collapse: collapse !important;
+    background-color: #1f1f1f !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* LARGURA DAS COLUNAS */
+#tabelaGeneros th:nth-child(1),
+#tabelaGeneros td:nth-child(1) {
+    width: 15%;
+}
+
+#tabelaGeneros th:nth-child(2),
+#tabelaGeneros td:nth-child(2) {
+    width: 60%;
+}
+
+#tabelaGeneros th:nth-child(3),
+#tabelaGeneros td:nth-child(3) {
+    width: 25%;
+}
+
+/* CABEÇALHO DA TABELA */
+#tabelaGeneros thead th {
+    background-color: #292929 !important;
+    color: #a66aff !important;
+    padding: 16px !important;
+    border-bottom: 1px solid #444444 !important;
+    border-top: none !important;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* LINHAS */
+#tabelaGeneros tbody tr {
+    background-color: #1f1f1f !important;
+}
+
+#tabelaGeneros tbody tr:hover {
+    background-color: #30283b !important;
+}
+
+#tabelaGeneros tbody td {
+    padding: 15px !important;
+    color: #b3b3b3 !important;
+    border-bottom: 1px solid #333333 !important;
+    border-top: none !important;
+    font-size: 14px;
+    overflow-wrap: break-word;
+}
+
+#tabelaGeneros tbody td.nome-genero {
+    color: #ffffff !important;
+    font-weight: bold;
+}
+
+/* AÇÕES */
+.acoes {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.acoes form {
+    margin: 0;
+}
+
+/* EXCLUIR */
+.btn-excluir {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 12px;
+    background-color: #c0392b;
+    color: #ffffff;
+    border: none;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-excluir i {
+    font-size: 17px;
+}
+
+.btn-excluir:hover {
+    background-color: #e74c3c;
+}
+
+/* DATATABLES */
+.dataTables_wrapper {
+    width: 100%;
+    padding: 15px 0;
+    color: #b3b3b3 !important;
+}
+
+/* PESQUISA E QUANTIDADE */
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_length {
+    color: #b3b3b3 !important;
+    margin-bottom: 20px;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    width: 180px !important;
+    padding: 5px 10px !important;
+    color: #ffffff !important;
+    background-color: #292929 !important;
+    border: 1px solid #555555 !important;
+    border-radius: 7px !important;
+    box-shadow: none !important;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #862cff !important;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    color: #ffffff !important;
+    background-color: #292929 !important;
+    border: 1px solid #555555 !important;
+    border-radius: 6px;
+}
+
+/* INFORMAÇÕES */
+.dataTables_wrapper .dataTables_info {
+    color: #888888 !important;
+    margin-top: 15px;
+}
+
+/* PAGINAÇÃO */
+.dataTables_wrapper .dataTables_paginate {
+    margin-top: 15px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #b3b3b3 !important;
+    background: transparent !important;
+    border: 1px solid #444444 !important;
+    border-radius: 6px !important;
+    margin-left: 4px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #7900ff !important;
+    border-color: #7900ff !important;
+    color: #ffffff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #7900ff !important;
+    border-color: #7900ff !important;
+    color: #ffffff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    color: #666666 !important;
+}
+
+/* TABELA VAZIA */
+#tabelaGeneros tbody td.dataTables_empty {
+    color: #b3b3b3 !important;
+    padding: 25px !important;
+}
+
+/* RODAPÉ */
+.rodape {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #333333;
+}
+
+.btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #b3b3b3;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-voltar i {
+    font-size: 20px;
+}
+
+.btn-voltar:hover {
+    color: #a66aff;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 700px) {
+
+    .pagina {
+        padding: 20px 10px;
+    }
+
+    .painel-generos {
+        padding: 22px 15px;
+    }
+
+    .cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .titulo-pagina h1 {
+        font-size: 22px;
+    }
+
+    .form-genero {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .campo-genero {
+        width: 100%;
+    }
+
+    .btn-adicionar {
+        width: 100%;
+    }
+
+    .btn-exportar {
+        width: 100%;
+    }
+
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_length {
+        float: none;
+        text-align: left;
+        margin-bottom: 15px;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        max-width: 150px;
+    }
+}

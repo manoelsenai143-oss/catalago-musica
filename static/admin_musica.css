@@ -1,0 +1,215 @@
+
+/* Configurações gerais */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #121212;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 35px 20px;
+}
+
+/* Painel principal */
+.container-painel {
+    max-width: 1050px;
+    margin: auto;
+    background-color: #1f1f1f;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Cabeçalho */
+.cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.cabecalho h4 {
+    color: #7900ff;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cabecalho h4 i {
+    font-size: 2rem;
+}
+
+/* Botão exportar */
+.btn-exportar {
+    display: inline-flex;
+    align-items: center;
+    background-color: #7900ff;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.btn-exportar:hover {
+    background-color: #a66aff;
+    color: #fff;
+}
+
+/* Tabela */
+.tabela-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#tabelaMusicasAdmin {
+    width: 100% !important;
+    border-collapse: collapse;
+    color: #fff;
+}
+
+#tabelaMusicasAdmin thead {
+    background-color: #282828;
+}
+
+#tabelaMusicasAdmin thead th {
+    color: #a66aff;
+    padding: 14px 12px;
+    border-bottom: 2px solid #7900ff;
+}
+
+#tabelaMusicasAdmin tbody tr {
+    background-color: #1f1f1f;
+    border-bottom: 1px solid #333;
+}
+
+#tabelaMusicasAdmin tbody tr:hover {
+    background-color: #292929;
+}
+
+#tabelaMusicasAdmin tbody td {
+    padding: 13px 12px;
+    color: #fff;
+}
+
+/* Coluna de ações */
+.coluna-acoes {
+    text-align: center;
+    width: 120px;
+}
+
+/* Botão excluir */
+.btn-excluir {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background-color: #c0392b;
+    color: #fff;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn-excluir:hover {
+    background-color: #e74c3c;
+}
+
+.btn-excluir i {
+    font-size: 17px;
+}
+
+/* Botão voltar */
+.btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    color: #b3b3b3;
+    text-decoration: none;
+    margin-top: 25px;
+    transition: 0.2s;
+}
+
+.btn-voltar:hover {
+    color: #a66aff;
+}
+
+/* DataTables */
+.dataTables_wrapper {
+    color: #fff;
+    padding: 15px 0;
+}
+
+.dataTables_wrapper input,
+.dataTables_wrapper select {
+    background-color: #292929 !important;
+    color: #fff !important;
+    border: 1px solid #444 !important;
+    border-radius: 5px !important;
+    padding: 5px !important;
+}
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    color: #b3b3b3 !important;
+}
+
+/* Paginação */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #fff !important;
+    border-radius: 5px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #333 !important;
+    border: 1px solid #555 !important;
+    color: #fff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #7900ff !important;
+    color: #fff !important;
+    border: 1px solid #7900ff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #a66aff !important;
+    color: #fff !important;
+    border: 1px solid #a66aff !important;
+}
+
+/* Responsividade */
+@media (max-width: 700px) {
+    body {
+        padding: 15px 10px;
+    }
+
+    .container-painel {
+        padding: 20px 15px;
+    }
+
+    .cabecalho {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cabecalho h4 {
+        font-size: 1.4rem;
+    }
+
+    .btn-exportar {
+        font-size: 0.85rem;
+    }
+}

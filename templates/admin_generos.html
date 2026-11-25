@@ -1,72 +1,224 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Gerenciar Géneros</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- 1. Importar CSS do DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <title>Gerenciar Gêneros - Administração</title>
 
-    <!-- Estilo para adaptar o DataTables ao tema escuro -->
-    <style>
-        .dataTables_wrapper { color: #fff; padding: 20px; background: #181818; border-radius: 6px; }
-        .dataTables_wrapper input, .dataTables_wrapper select { background: #2a2a2a; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 4px; }
-        .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate { color: #b3b3b3 !important; }
-        .dataTables_wrapper .dataTables_paginate .paginate_button { color: #fff !important; }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #1db954 !important; color: #fff !important; border: 1px solid #1db954 !important; }
-    </style>
+    <!-- MATERIALIZE CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- MATERIAL ICONS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+
+    <!-- DATATABLES CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- CSS PRÓPRIO -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='admin_generos.css') }}">
 </head>
-<body style="background-color: #121212; color: #fff; font-family: Arial, sans-serif; padding: 40px;">
-    <div style="max-width: 750px; margin: auto; background: #181818; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-        <h2 style="color: #3498db; margin-bottom: 20px;">🎵 Gestão de Géneros</h2>
 
-        <!-- Formulário para Adicionar Novo Género -->
-        <form action="{{ url_for('admin_gerenciar_generos') }}" method="POST" style="margin-bottom: 25px; display: flex; gap: 10px;">
-            <input type="text" name="nome_genero" placeholder="Nome do novo género" required style="flex: 1; padding: 10px; background: #333; border: none; color: #fff; border-radius: 5px;">
-            <button type="submit" style="background: #3498db; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer;">Adicionar</button>
-        </form>
+<body>
 
-        <!-- Tabela de Géneros com ID para o DataTables -->
-        <table id="tabelaGeneros" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-            <thead>
-                <tr style="background: #282828; text-align: left;">
-                    <th style="padding: 12px;">ID</th>
-                    <th style="padding: 12px;">Nome do Género</th>
-                    <th style="padding: 12px; text-align: center; width: 130px;">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for g in generos %}
-                <tr style="border-bottom: 1px solid #333;">
-                    <td style="padding: 12px;">{{ g.id_genero }}</td>
-                    <td style="padding: 12px;">{{ g.nome_genero }}</td>
-                    <td style="padding: 12px; text-align: center;">
-                        <form action="{{ url_for('admin_excluir_genero', id_genero=g.id_genero) }}" method="POST" style="display:inline;">
-                            <button type="submit" onclick="return confirm('Tem certeza que deseja excluir este género?');" style="background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">Excluir</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <main class="pagina">
 
-        <a href="{{ url_for('admin_home') }}" style="color: #b3b3b3; text-decoration: none; display: inline-block; margin-top: 10px;">← Voltar ao Painel Admin</a>
-    </div>
+        <section class="painel-generos">
 
-    <!-- 2. jQuery e DataTables JS -->
+            <!-- CABEÇALHO -->
+            <header class="cabecalho">
+
+                <div class="titulo-pagina">
+
+                    <div class="icone-titulo">
+                        <i class="material-icons">library_music</i>
+                    </div>
+
+                    <div>
+                        <h1>Gestão de Gêneros</h1>
+                        <p>Gerencie os gêneros musicais da plataforma</p>
+                    </div>
+
+                </div>
+
+                <!-- EXPORTAR PDF -->
+                <a href="{{ url_for('exportar_generos_pdf') }}"
+                   class="btn-exportar">
+
+                    <i class="material-icons">picture_as_pdf</i>
+                    Exportar PDF
+
+                </a>
+
+            </header>
+
+
+            <!-- CADASTRAR GÊNERO -->
+            <section class="secao-cadastro">
+
+                <div class="titulo-secao">
+                    <i class="material-icons">add_circle</i>
+                    <h2>Adicionar Novo Gênero</h2>
+                </div>
+
+                <form action="{{ url_for('admin_gerenciar_generos') }}"
+                      method="POST"
+                      class="form-genero">
+
+                    <div class="campo-genero">
+
+                        <i class="material-icons">music_note</i>
+
+                        <input
+                            type="text"
+                            name="nome_genero"
+                            placeholder="Digite o nome do gênero"
+                            required
+                        >
+
+                    </div>
+
+                    <button type="submit" class="btn-adicionar">
+
+                        <i class="material-icons">add</i>
+                        Adicionar
+
+                    </button>
+
+                </form>
+
+            </section>
+
+
+            <!-- TABELA -->
+            <section class="secao-tabela">
+
+                <div class="titulo-secao">
+                    <i class="material-icons">list</i>
+                    <h2>Gêneros Cadastrados</h2>
+                </div>
+
+                <div class="tabela-container">
+
+                    <table id="tabelaGeneros">
+
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome do Gênero</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for g in generos %}
+
+                            <tr>
+
+                                <td>{{ g.id_genero }}</td>
+
+                                <td class="nome-genero">
+                                    {{ g.nome_genero }}
+                                </td>
+
+                                <td>
+
+                                    <div class="acoes">
+
+                                        <form
+                                            action="{{ url_for('admin_excluir_genero', id_genero=g.id_genero) }}"
+                                            method="POST"
+                                            onsubmit="return confirm('Tem certeza que deseja excluir este gênero?');">
+
+                                            <button type="submit"
+                                                    class="btn-excluir">
+
+                                                <i class="material-icons">delete</i>
+                                                Excluir
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- VOLTAR -->
+            <div class="rodape">
+
+                <a href="{{ url_for('admin_home') }}" class="btn-voltar">
+
+                    <i class="material-icons">arrow_back</i>
+                    Voltar ao Painel Admin
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- JQUERY -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <!-- MATERIALIZE JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <!-- DATATABLES JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-    <!-- 3. Ativar o DataTables -->
+
+    <!-- CONFIGURAÇÃO DATATABLES -->
     <script>
+
         $(document).ready(function() {
+
             $('#tabelaGeneros').DataTable({
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json"
-                }
+
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+                },
+
+                pageLength: 10,
+
+                autoWidth: false,
+
+                scrollX: false,
+
+                columnDefs: [
+                    {
+                        orderable: false,
+                        targets: 2
+                    }
+                ]
+
             });
+
         });
+
     </script>
+
 </body>
 </html>

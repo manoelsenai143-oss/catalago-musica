@@ -4,54 +4,189 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastrar Nova Música</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='playlists.css') }}">
+
+    <!-- Materialize CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- CSS específico desta página -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='adidionar_musica.css') }}">
 </head>
 <body>
 
-    <!-- Link para voltar à lista de músicas -->
-    <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}" class="link-voltar">← Voltar à Lista de Músicas</a>
+    <div class="page-container">
 
-    <div class="form-container">
-        <h1>Cadastrar Nova Música</h1>
+        <!-- Voltar -->
+        <div class="page-header">
+            <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}"
+               class="btn-flat waves-effect btn-voltar">
+                <i class="material-icons left">arrow_back</i>
+                Voltar à Lista de Músicas
+            </a>
+        </div>
 
-        {% if erro %}
-            <p style="color: #ff5252; margin-bottom: 15px;">{{ erro }}</p>
-        {% endif %}
+        <div class="card dark-card z-depth-3">
+            <div class="card-content">
 
-        <form method="POST">
-            <div class="form-group">
-                <label>Título da Música:</label>
-                <input type="text" name="titulo" required>
+                <!-- Header com ícone + título lado a lado -->
+                <div class="form-header">
+                    <div class="form-header-icon">
+                        <i class="material-icons">library_music</i>
+                    </div>
+                    <div class="form-header-text">
+                        <h4>Cadastrar Nova Música</h4>
+                        <p>Adicione uma nova faixa ao seu catálogo</p>
+                    </div>
+                </div>
+
+                {% if erro %}
+                <div id="erro-msg" data-erro="{{ erro }}" class="mensagem-erro">
+                    <i class="material-icons tiny">error_outline</i>
+                    {{ erro }}
+                </div>
+                {% endif %}
+
+                <form method="POST" id="form-musica" novalidate>
+
+                    <!-- Título -->
+                    <div class="input-field">
+                        <i class="material-icons prefix">music_note</i>
+                        <input type="text" id="titulo" name="titulo"
+                               class="validate" required minlength="2"
+                               autocomplete="off">
+                        <label for="titulo">Título da Música</label>
+                        <span class="helper-text"
+                              data-error="Mínimo 2 caracteres"
+                              data-success=""></span>
+                    </div>
+
+                    <!-- Duração com máscara automática -->
+                    <div class="input-field">
+                        <i class="material-icons prefix">schedule</i>
+                        <input type="text" id="duracao" name="duracao"
+                               class="validate"
+                               pattern="\d{2}:\d{2}"
+                               maxlength="5"
+                               inputmode="numeric"
+                               oninput="mascaraDuracao(this)"
+                               required>
+                        <label for="duracao">Duração</label>
+                        <span class="helper-text"
+                              data-error="Digite 4 números (ex: 0345 → 03:45)"
+                              data-success=""></span>
+                    </div>
+
+                    <!-- Álbum (opcional) -->
+                    <div class="input-field">
+                        <i class="material-icons prefix">album</i>
+                        <select name="id_album" id="id_album">
+                            <option value="" selected>— Single (Sem Álbum) —</option>
+                            {% for album in albuns %}
+                                <option value="{{ album.id_album }}">{{ album.nome_album }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="id_album">Álbum</label>
+                    </div>
+
+                    <!-- Gênero -->
+                    <div class="input-field">
+                        <i class="material-icons prefix">category</i>
+                        <select name="id_genero" id="id_genero">
+                            <option value="" disabled selected>Selecione um gênero</option>
+                            {% for genero in generos %}
+                                <option value="{{ genero.id_genero }}">{{ genero.nome_genero }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="id_genero">Gênero</label>
+                        <span class="helper-text helper-genero" id="helper-genero"></span>
+                    </div>
+
+                    <!-- Ações -->
+                    <div class="form-actions">
+                        <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}"
+                           class="btn-flat waves-effect btn-cancelar">
+                            Cancelar
+                        </a>
+                        <button type="submit"
+                                class="btn-large waves-effect waves-light btn-guardar">
+                            <i class="material-icons left">save</i>
+                            Guardar Música
+                        </button>
+                    </div>
+
+                </form>
+
             </div>
+        </div>
 
-            <div class="form-group">
-                <label>Duração (ex: 03:45):</label>
-                <input type="text" name="duracao" required>
-            </div>
-
-            <div class="form-group">
-                <label>Álbum (Opcional):</label>
-                <select name="id_album">
-                    <option value="">-- Single (Sem Álbum) --</option>
-                    {% for album in albuns %}
-                        <option value="{{ album.id_album }}">{{ album.nome_album }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Gênero:</label>
-                <select name="id_genero" required>
-                    <option value="">Selecione um gênero</option>
-                    {% for genero in generos %}
-                        <option value="{{ genero.id_genero }}">{{ genero.nome_genero }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <button type="submit" class="btn-submit">Guardar Música</button>
-        </form>
     </div>
 
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            M.updateTextFields();
+
+            // Inicializa selects do Materialize
+            document.querySelectorAll('select').forEach(sel => {
+                M.FormSelect.init(sel);
+            });
+
+            // Toast de erro do Flask
+            const erroDiv = document.getElementById('erro-msg');
+            if (erroDiv) {
+                M.toast({
+                    html: '<i class="material-icons tiny">error_outline</i> ' + erroDiv.dataset.erro,
+                    classes: 'red darken-2 rounded',
+                    displayLength: 5000
+                });
+            }
+
+            // Validação no submit (inclui o select de género manualmente)
+            document.getElementById('form-musica').addEventListener('submit', (e) => {
+                let valido = true;
+
+                // Campos .validate normais
+                e.target.querySelectorAll('.validate').forEach(c => {
+                    if (!c.validity.valid) valido = false;
+                });
+
+                // Select de género — o Materialize esconde o <select> real
+                const genero = document.getElementById('id_genero');
+                const helperGenero = document.getElementById('helper-genero');
+                if (genero.value === '') {
+                    valido = false;
+                    helperGenero.textContent = 'Escolha um gênero';
+                } else {
+                    helperGenero.textContent = '';
+                }
+
+                if (!valido) {
+                    e.preventDefault();
+                    M.toast({
+                        html: '<i class="material-icons tiny">warning</i> Corrija os campos destacados',
+                        classes: 'orange darken-3 rounded'
+                    });
+                }
+            });
+
+            // Limpa o erro do género assim que o user escolhe
+            document.getElementById('id_genero').addEventListener('change', (e) => {
+                if (e.target.value !== '') {
+                    document.getElementById('helper-genero').textContent = '';
+                }
+            });
+        });
+
+        // Máscara de duração: "0345" → "03:45"
+        function mascaraDuracao(input) {
+            let v = input.value.replace(/\D/g, '');      // só números
+            if (v.length > 4) v = v.slice(0, 4);         // máx 4 dígitos
+            if (v.length > 2) v = v.slice(0, 2) + ':' + v.slice(2);
+            input.value = v;
+        }
+    </script>
 </body>
 </html>

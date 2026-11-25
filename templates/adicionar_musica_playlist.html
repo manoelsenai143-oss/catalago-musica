@@ -1,50 +1,85 @@
+
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adicionar Música à Playlist</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='playlists.css') }}">
+
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+
+    <!-- CSS próprio -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='adicionar.css') }}">
 </head>
+
 <body>
 
-    <!-- Link para voltar aos detalhes da playlist -->
-    <a href="{{ url_for('detalhes_playlist', usuario_id=usuario_id, playlist_id=playlist_id) }}" class="link-voltar">← Voltar aos Detalhes</a>
+    <main class="container-principal">
 
-    <div style="max-width: 500px; margin: 40px auto; background: #181818; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-        <h1 style="color: #ffffff; margin-top: 0; margin-bottom: 20px; font-size: 1.5em;">Adicionar Música à Playlist</h1>
+        <a href="{{ url_for('detalhes_playlist', usuario_id=usuario_id, playlist_id=playlist_id) }}"
+           class="link-voltar">
+            <i class="material-icons">arrow_back</i>
+            Voltar aos detalhes
+        </a>
 
-        <form method="POST">
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; color: #b3b3b3; font-weight: bold;">Escolha uma música do catálogo:</label>
-                <select name="id_musica" id="selectMusica" style="width: 100%;" required>
-                    <option value=""></option>
-                    {% for musica in musicas %}
-                        <option value="{{ musica.id_musica }}">
-                            {{ musica.titulo }} — {{ musica.artista }}
-                        </option>
-                    {% endfor %}
-                </select>
+        <div class="card-adicionar">
+
+            <div class="icone-musica">
+                <i class="material-icons">library_music</i>
             </div>
 
-            <button type="submit" style="background: #1db954; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1em;">
-                Adicionar à Playlist
-            </button>
-        </form>
-    </div>
+            <h1>Adicionar Música</h1>
 
-    <!-- jQuery e Select2 JS -->
+            <p class="descricao">
+                Escolha uma música do catálogo para adicionar à sua playlist.
+            </p>
+
+            <form method="POST">
+
+                <div class="campo-musica">
+                    <label for="selectMusica">Escolha uma música</label>
+
+                    <select name="id_musica" id="selectMusica" required>
+                        <option value=""></option>
+
+                        {% for musica in musicas %}
+                            <option value="{{ musica.id_musica }}">
+                                {{ musica.titulo }} — {{ musica.artista }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-adicionar">
+                    <i class="material-icons">add</i>
+                    Adicionar à Playlist
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <!-- Select2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         $(document).ready(function() {
             $('#selectMusica').select2({
                 placeholder: "Pesquise pelo título ou artista...",
-                allowClear: true
+                allowClear: true,
+                width: '100%'
             });
         });
     </script>

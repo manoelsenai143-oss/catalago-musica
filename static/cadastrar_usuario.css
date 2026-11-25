@@ -1,73 +1,132 @@
+/* ===== Variáveis ===== */
+:root {
+    --bg-body:   #121212;
+    --bg-card:   #1e1e1e;
+    --text-main: #ffffff;
+    --text-mute: #b0b0b0;
+    --accent:    #6200ee;
+    --accent-hv: #7c3aed;
+    --ok:        #4caf50;
+    --err:       #ef5350;
+}
+
+/* ===== Body ===== */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #121212;
-    color: #ffffff;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    min-height: 100vh;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    margin: 0;
+    padding: 20px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color-scheme: dark;          /* scrollbars e controls nativos em dark */
+}
+
+/* ===== Card ===== */
+.dark-card {
+    background-color: var(--bg-card) !important;
+    border-radius: 14px !important;
     margin: 0;
 }
+.dark-card .card-content { padding: 32px 28px !important; }
 
-h2 {
+/* ===== Título ===== */
+.dark-card h4 {
+    font-weight: 600;
+    margin-bottom: 24px;
+    line-height: 1.4;
+}
+.dark-card h4 .material-icons.medium { color: var(--accent); }
+
+/* ===== Inputs ===== */
+.input-field input {
+    color: var(--text-main) !important;
+    border-bottom: 1px solid #555 !important;
+    caret-color: var(--accent);
+}
+.input-field input:focus {
+    border-bottom: 1px solid var(--accent) !important;
+    box-shadow: 0 1px 0 0 var(--accent) !important;
+}
+.input-field label         { color: var(--text-mute) !important; }
+.input-field label.active  { color: var(--accent) !important; }
+.input-field .prefix       { color: #666; }
+.input-field .prefix.active{ color: var(--accent) !important; }
+
+/* Validação visual */
+.input-field input.valid   { border-bottom-color: var(--ok)  !important; }
+.input-field input.invalid { border-bottom-color: var(--err) !important; }
+.input-field .helper-text  { color: var(--err) !important; min-height: 18px; }
+
+/* ===== Olho (mostrar / ocultar senha) ===== */
+.input-field { position: relative; }
+
+.toggle-password {
+    position: absolute;
+    right: 0;
+    top: 0.8rem;
+    cursor: pointer;                        /* cursor de clique */
+    color: #666;
+    transition: color .2s ease, transform .2s ease;
+    user-select: none;
+}
+.toggle-password:hover {
+    color: var(--accent);
+    transform: scale(1.1);
+}
+
+/* ===== Botão principal ===== */
+.btn-cadastrar {
+    width: 100% !important;
+    background-color: var(--accent) !important;
+    border-radius: 10px !important;
+    font-weight: 600;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-cadastrar:hover { background-color: var(--accent-hv) !important; }
+.btn-cadastrar .material-icons.right {
+    margin-left: 8px;
+    margin-right: 0;
+}
+
+/* ===== Alerta de erro (vindo do Flask) ===== */
+.card-panel.red.darken-2 {
+    border-radius: 10px;
+    padding: 12px 16px;
     margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+.card-panel .material-icons.tiny {
+    vertical-align: middle;
+    margin-right: 4px;
+    font-size: 18px;
 }
 
-form {
-    background: #1e1e1e;
-    padding: 25px;
+/* ===== Divider + link de login ===== */
+.divider { background-color: #333; margin: 24px 0 16px; }
+
+.login-link .btn-flat {
+    color: var(--text-mute) !important;
+    text-transform: none;
+    font-weight: 500;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    width: 320px;
 }
-
-label {
-    font-size: 14px;
-    font-weight: bold;
+.login-link .btn-flat:hover {
+    background-color: rgba(98, 0, 238, .15) !important;
+    color: var(--accent) !important;
 }
+.login-link .btn-flat .material-icons.left { margin-right: 8px; }
 
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0 16px 0;
-    border: 1px solid #333;
-    border-radius: 4px;
-    background: #2a2a2a;
-    color: white;
-    box-sizing: border-box;
-}
+/* ===== Toast arredondado ===== */
+.toast.rounded { border-radius: 30px; }
 
-button {
-    width: 100%;
-    padding: 10px;
-    background: #6200ee;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-button:hover {
-    background: #3700b3;
-}
-
-.mensagem-erro {
-    color: #ff5252;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-a {
-    color: #bb86fc;
-    text-decoration: none;
-    margin-top: 15px;
-    display: block;
-    text-align: center;
-}
-
-a:hover {
-    text-decoration: underline;
+/* ===== Responsivo ===== */
+@media (max-width: 600px) {
+    .dark-card .card-content { padding: 24px 18px !important; }
+    .dark-card h4             { font-size: 1.3rem; }
 }

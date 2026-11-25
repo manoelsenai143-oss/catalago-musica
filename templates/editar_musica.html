@@ -1,90 +1,154 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Editar Música - Painel do Músico</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Materialize CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+
+    <!-- CSS próprio -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='editar_musica.css') }}">
 </head>
-<body style="background-color: #121212; color: #fff; margin: 0; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden;">
 
-    <!-- BARRA LATERAL (SIDEBAR) -->
-    <div style="width: 240px; background-color: #000; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; border-right: 1px solid #222;">
-        <div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 30px; color: #1db954; font-weight: bold; font-size: 1.2rem;">
-                🎵 Sistema
-            </div>
+<body>
 
-            <nav style="display: flex; flex-direction: column; gap: 15px;">
-                <a href="{{ url_for('musico_home', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
-                    🏠 Início
-                </a>
-                <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}" style="color: #fff; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
-                    🎶 Músicas
-                </a>
-                <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 10px;">
-                    💿 Álbuns
-                </a>
-            </nav>
-        </div>
+    <main class="pagina">
 
-        <div>
-            <a href="{{ url_for('logout') }}" style="color: #e74c3c; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                🚪 Terminar Sessão
-            </a>
-        </div>
-    </div>
+        <div class="card-editar">
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div style="flex: 1; padding: 40px; overflow-y: auto; background-color: #121212;">
-        <div style="max-width: 600px; margin: auto; background-color: #181818; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-            <h2 style="color: #fff; margin-top: 0; margin-bottom: 25px;">✏️ Editar Música</h2>
+            <!-- CABEÇALHO -->
+            <header class="cabecalho">
+                <div class="icone-titulo">
+                    <i class="material-icons">edit</i>
+                </div>
 
+                <div>
+                    <h4>Editar Música</h4>
+                    <p>Atualize as informações desta faixa</p>
+                </div>
+            </header>
+
+            <div class="divisor"></div>
+
+            <!-- FORMULÁRIO -->
             <form method="POST">
-                <!-- Título -->
-                <div style="margin-bottom: 20px;">
-                    <label for="titulo" style="display: block; margin-bottom: 8px; font-weight: bold; color: #b3b3b3;">Título:</label>
-                    <input type="text" id="titulo" name="titulo" value="{{ musica.titulo }}" required style="width: 100%; padding: 10px; background-color: #222; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;">
+
+                <!-- TÍTULO -->
+                <div class="campo-linha">
+                    <i class="material-icons icone-campo">music_note</i>
+
+                    <div class="campo-conteudo input-field">
+                        <input
+                            type="text"
+                            id="titulo"
+                            name="titulo"
+                            value="{{ musica.titulo }}"
+                            required
+                        >
+                        <label for="titulo" class="active">Título</label>
+                    </div>
                 </div>
 
-                <!-- Duração -->
-                <div style="margin-bottom: 20px;">
-                    <label for="duracao" style="display: block; margin-bottom: 8px; font-weight: bold; color: #b3b3b3;">Duração:</label>
-                    <input type="text" id="duracao" name="duracao" value="{{ musica.duracao }}" required style="width: 100%; padding: 10px; background-color: #222; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;">
+                <!-- DURAÇÃO -->
+                <div class="campo-linha">
+                    <i class="material-icons icone-campo">schedule</i>
+
+                    <div class="campo-conteudo input-field">
+                        <input
+                            type="text"
+                            id="duracao"
+                            name="duracao"
+                            value="{{ musica.duracao }}"
+                            required
+                        >
+                        <label for="duracao" class="active">Duração</label>
+                    </div>
                 </div>
 
-                <!-- Gênero -->
-                <div style="margin-bottom: 20px;">
-                    <label for="id_genero" style="display: block; margin-bottom: 8px; font-weight: bold; color: #b3b3b3;">Gênero:</label>
-                    <select id="id_genero" name="id_genero" required style="width: 100%; padding: 10px; background-color: #222; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;">
-                        {% for genero in generos %}
-                            <option value="{{ genero.id_genero }}" {% if genero.id_genero == musica.id_genero %}selected{% endif %}>
-                                {{ genero.nome_genero }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                <!-- GÊNERO -->
+                <div class="campo-linha">
+                    <i class="material-icons icone-campo">category</i>
+
+                    <div class="campo-conteudo input-field">
+                        <select id="id_genero" name="id_genero" required>
+                            {% for genero in generos %}
+                                <option
+                                    value="{{ genero.id_genero }}"
+                                    {% if genero.id_genero == musica.id_genero %}selected{% endif %}
+                                >
+                                    {{ genero.nome_genero }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <label>Gênero</label>
+                    </div>
                 </div>
 
-                <!-- Álbum -->
-                <div style="margin-bottom: 25px;">
-                    <label for="id_album" style="display: block; margin-bottom: 8px; font-weight: bold; color: #b3b3b3;">Álbum:</label>
-                    <select id="id_album" name="id_album" style="width: 100%; padding: 10px; background-color: #222; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;">
-                        <option value="">Nenhum (Single)</option>
-                        {% for album in albuns %}
-                            <option value="{{ album.id_album }}" {% if album.id_album == musica.id_album %}selected{% endif %}>
-                                {{ album.nome_album }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                <!-- ÁLBUM -->
+                <div class="campo-linha">
+                    <i class="material-icons icone-campo">album</i>
+
+                    <div class="campo-conteudo input-field">
+                        <select id="id_album" name="id_album">
+                            <option value="">Nenhum (Single)</option>
+
+                            {% for album in albuns %}
+                                <option
+                                    value="{{ album.id_album }}"
+                                    {% if album.id_album == musica.id_album %}selected{% endif %}
+                                >
+                                    {{ album.nome_album }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <label>Álbum</label>
+                    </div>
                 </div>
 
-                <!-- Botões de Ação -->
-                <div style="display: flex; gap: 10px;">
-                    <button type="submit" style="flex: 1; padding: 12px; background-color: #1db954; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Salvar Alterações</button>
-                    <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}" style="flex: 1; text-align: center; padding: 12px; background-color: #333; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">Cancelar</a>
+                <div class="divisor divisor-final"></div>
+
+                <!-- BOTÕES -->
+                <div class="botoes">
+
+                    <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}"
+                       class="btn-cancelar">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn-salvar">
+                        <i class="material-icons">save</i>
+                        Salvar Alterações
+                    </button>
+
                 </div>
+
             </form>
+
         </div>
-    </div>
+
+    </main>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elementos = document.querySelectorAll('select');
+            M.FormSelect.init(elementos);
+        });
+    </script>
 
 </body>
 </html>

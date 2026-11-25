@@ -1,86 +1,217 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Meus Álbuns - Painel do Músico</title>
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='musico_listar.css') }}">
+
+    <!-- MATERIALIZE CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- MATERIAL ICONS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+
+    <!-- DATATABLES CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- CSS PRÓPRIO -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='listar_album.css') }}">
 </head>
-<body style="margin: 0; display: flex; height: 100vh; overflow: hidden; background-color: #121212; color: #fff; font-family: sans-serif;">
 
-    <!-- BARRA LATERAL (SIDEBAR) -->
-    <div style="width: 240px; background-color: #000; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; border-right: 1px solid #222;">
+<body>
+
+    <!-- BARRA LATERAL -->
+    <aside class="sidebar">
+
         <div>
-            <div style="color: #1db954; font-weight: bold; font-size: 1.2rem; margin-bottom: 30px;">
-                🎵 Sistema
+            <div class="logo">
+                <i class="material-icons">music_note</i>
+                <span>Sistema</span>
             </div>
-            <nav style="display: flex; flex-direction: column; gap: 15px;">
-                <a href="{{ url_for('musico_home', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold;">🏠 Início</a>
-                <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}" style="color: #b3b3b3; text-decoration: none; font-weight: bold;">🎶 Músicas</a>
-                <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}" style="color: #fff; text-decoration: none; font-weight: bold;">💿 Álbuns</a>
-            </nav>
-        </div>
-        <div>
-            <a href="{{ url_for('logout') }}" style="color: #e74c3c; text-decoration: none; font-weight: bold; font-size: 0.9rem;">🚪 Terminar Sessão</a>
-        </div>
-    </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div style="flex: 1; padding: 40px; overflow-y: auto;">
+            <div class="menu">
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-            <h1 style="font-size: 2rem; margin: 0; color: #fff;">💿 Meus Álbuns</h1>
-            <a href="{{ url_for('musico_cadastrar_album', musico_id=musico_id) }}">
-                <button type="button" style="padding: 10px 15px; background-color: #1db954; color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">+ Novo Álbum</button>
+                <a href="{{ url_for('musico_home', musico_id=musico_id) }}">
+                    <i class="material-icons">home</i>
+                    Início
+                </a>
+
+                <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}">
+                    <i class="material-icons">library_music</i>
+                    Músicas
+                </a>
+
+                <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}"
+                   class="ativo">
+                    <i class="material-icons">album</i>
+                    Álbuns
+                </a>
+
+            </div>
+        </div>
+
+        <!-- SAIR -->
+        <div class="sair">
+            <a href="{{ url_for('logout') }}">
+                <i class="material-icons">logout</i>
+                Terminar Sessão
             </a>
         </div>
 
-        <!-- Tabela com DataTables -->
-        <table id="tabelaAlbuns" class="display" style="width:100%">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome do Álbum</th>
-                    <th>Ano</th>
-                    <th style="text-align: center;">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for album in albuns %}
-                <tr>
-                    <td>{{ album.id_album }}</td>
-                    <td style="font-weight: bold; color: #fff;">{{ album.nome_album }}</td>
-                    <td>{{ album.ano_album if album.ano_album else 'N/D' }}</td>
-                    <td style="text-align: center;">
-                        <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                            <!-- Botão Editar -->
-                            <a href="{{ url_for('atualizar_album', musico_id=musico_id, id_album=album.id_album) }}" style="padding: 5px 10px; background-color: #f39c12; color: #fff; text-decoration: none; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">Editar</a>
+    </aside>
 
-                            <!-- Botão Excluir com Alerta de Confirmação -->
-                            <form action="{{ url_for('musico_excluir_album', musico_id=musico_id, id_album=album.id_album) }}" method="POST" style="display:inline; margin: 0;">
-                                <button type="submit" onclick="return confirm('⚠️ Atenção: Ao excluir este álbum, todas as músicas relacionadas a ele também serão excluídas permanentemente. Deseja continuar?')" style="padding: 5px 10px; background-color: #e74c3c; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold;">Excluir</button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
 
-    </div>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="conteudo">
 
-    <!-- Scripts do jQuery e DataTables -->
+        <!-- CABEÇALHO -->
+        <div class="topo">
+
+            <div>
+                <h1>Meus Álbuns</h1>
+                <p>Gerencie seus álbuns cadastrados no sistema</p>
+            </div>
+
+            <a href="{{ url_for('musico_cadastrar_album', musico_id=musico_id) }}"
+               class="btn-novo">
+
+                <i class="material-icons">add</i>
+                Novo Álbum
+
+            </a>
+
+        </div>
+
+
+        <!-- CARD DA TABELA -->
+        <section class="card-tabela">
+
+            <div class="titulo-tabela">
+                <i class="material-icons">album</i>
+                <h5>Álbuns cadastrados</h5>
+            </div>
+
+            <div class="tabela-container">
+
+                <table id="tabelaAlbuns" class="display">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome do Álbum</th>
+                            <th>Ano</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for album in albuns %}
+
+                        <tr>
+
+                            <td>{{ album.id_album }}</td>
+
+                            <td class="nome-album">
+                                {{ album.nome_album }}
+                            </td>
+
+                            <td>
+                                {{ album.ano_album if album.ano_album else 'N/D' }}
+                            </td>
+
+                            <td>
+
+                                <div class="acoes">
+
+                                    <!-- EDITAR -->
+                                    <a href="{{ url_for('atualizar_album', musico_id=musico_id, id_album=album.id_album) }}"
+                                       class="btn-editar">
+
+                                        <i class="material-icons">edit</i>
+                                        Editar
+
+                                    </a>
+
+                                    <!-- EXCLUIR -->
+                                    <form action="{{ url_for('musico_excluir_album', musico_id=musico_id, id_album=album.id_album) }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Atenção: Ao excluir este álbum, todas as músicas relacionadas a ele também serão excluídas permanentemente. Deseja continuar?')">
+
+                                        <button type="submit" class="btn-excluir">
+
+                                            <i class="material-icons">delete</i>
+                                            Excluir
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- JQUERY -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <!-- MATERIALIZE JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <!-- DATATABLES JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- CONFIGURAÇÃO DATATABLES -->
     <script>
+
         $(document).ready(function() {
+
             $('#tabelaAlbuns').DataTable({
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json"
-                }
+
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+                },
+
+                pageLength: 10,
+
+                autoWidth: false,
+
+                scrollX: false,
+
+                order: [[0, 'asc']],
+
+                columnDefs: [
+                    {
+                        orderable: false,
+                        targets: 3
+                    }
+                ]
+
             });
+
         });
+
     </script>
+
 </body>
 </html>

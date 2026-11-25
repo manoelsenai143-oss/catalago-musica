@@ -1,0 +1,338 @@
+
+/* CONFIGURAÇÕES GERAIS */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+}
+
+/* PÁGINA */
+.pagina-admin {
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+/* PAINEL */
+.painel {
+    width: 100%;
+    max-width: 1100px;
+    margin: auto;
+    background-color: #1f1f1f;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+}
+
+/* CABEÇALHO */
+.cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 25px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #333333;
+}
+
+.titulo-admin {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.icone-admin {
+    width: 65px;
+    height: 65px;
+    min-width: 65px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #7100ff, #862cff);
+    border-radius: 17px;
+    box-shadow: 0 5px 15px rgba(112, 0, 255, 0.2);
+}
+
+.icone-admin i {
+    color: #ffffff;
+    font-size: 35px;
+}
+
+.titulo-admin h1 {
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: bold;
+    margin: 0 0 8px;
+}
+
+.titulo-admin p {
+    color: #b3b3b3;
+    font-size: 15px;
+    margin: 0;
+}
+
+/* BOTÃO SAIR */
+.btn-sair {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    background-color: #292929;
+    color: #ff5c5c;
+    border-radius: 9px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-sair i {
+    font-size: 20px;
+}
+
+.btn-sair:hover {
+    background-color: #3a2222;
+    color: #ff7777;
+}
+
+/* TÍTULOS DAS SEÇÕES */
+.titulo-secao {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.titulo-secao i {
+    color: #862cff;
+    font-size: 27px;
+}
+
+.titulo-secao h2 {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* ESTATÍSTICAS */
+.estatisticas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.card-estatistica {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background-color: #292929;
+    padding: 22px 18px;
+    border-radius: 12px;
+    border: 1px solid #353535;
+    transition: 0.3s;
+}
+
+.card-estatistica:hover {
+    background-color: #30283b;
+    transform: translateY(-3px);
+}
+
+/* ÍCONES DAS ESTATÍSTICAS */
+.icone-estatistica {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #382354;
+    border-radius: 12px;
+}
+
+.icone-estatistica i {
+    color: #a66aff;
+    font-size: 27px;
+}
+
+/* TEXTOS DAS ESTATÍSTICAS */
+.card-estatistica p {
+    color: #b3b3b3;
+    font-size: 13px;
+    margin: 0 0 8px;
+}
+
+.card-estatistica h3 {
+    color: #ffffff;
+    font-size: 27px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* GESTÃO DA PLATAFORMA */
+.secao-gestao {
+    margin-top: 10px;
+}
+
+.opcoes-gestao {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+/* CARDS DE GESTÃO */
+.card-gestao {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background-color: #292929;
+    border: 1px solid #353535;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.card-gestao:hover {
+    background-color: #30283b;
+    border-color: #7100ff;
+    transform: translateY(-3px);
+}
+
+/* ÍCONES DA GESTÃO */
+.icone-gestao {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #382354;
+    border-radius: 12px;
+}
+
+.icone-gestao i {
+    color: #a66aff;
+    font-size: 27px;
+}
+
+/* TEXTOS DA GESTÃO */
+.texto-gestao {
+    flex: 1;
+    min-width: 0;
+}
+
+.texto-gestao h3 {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 7px;
+}
+
+.texto-gestao p {
+    color: #999999;
+    font-size: 13px;
+    margin: 0;
+}
+
+/* SETA */
+.seta {
+    color: #777777;
+    font-size: 22px;
+    transition: 0.3s;
+}
+
+.card-gestao:hover .seta {
+    color: #a66aff;
+    transform: translateX(4px);
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 900px) {
+
+    .estatisticas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .painel {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .pagina-admin {
+        padding: 15px 10px;
+    }
+
+    .painel {
+        padding: 20px 15px;
+        border-radius: 14px;
+    }
+
+    .cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .titulo-admin h1 {
+        font-size: 21px;
+    }
+
+    .titulo-admin p {
+        font-size: 13px;
+    }
+
+    .icone-admin {
+        width: 55px;
+        height: 55px;
+        min-width: 55px;
+    }
+
+    .estatisticas {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .card-estatistica {
+        padding: 15px 10px;
+        gap: 10px;
+    }
+
+    .icone-estatistica {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+    }
+
+    .icone-estatistica i {
+        font-size: 22px;
+    }
+
+    .card-estatistica h3 {
+        font-size: 22px;
+    }
+
+    .card-estatistica p {
+        font-size: 12px;
+    }
+
+    .opcoes-gestao {
+        grid-template-columns: 1fr;
+    }
+
+    .titulo-secao h2 {
+        font-size: 18px;
+    }
+
+    .card-gestao {
+        padding: 16px;
+    }
+}

@@ -1,0 +1,149 @@
+
+/* Configurações gerais */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #121212;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 35px 20px;
+}
+
+/* Container principal */
+.container-formulario {
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+/* Link voltar */
+.link-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #b3b3b3;
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: 0.2s;
+}
+
+.link-voltar:hover {
+    color: #a66aff;
+}
+
+.link-voltar i {
+    font-size: 20px;
+}
+
+/* Card do formulário */
+.card-formulario {
+    background-color: #1f1f1f;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Título */
+.titulo-formulario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.titulo-formulario i {
+    color: #7900ff;
+    font-size: 30px;
+}
+
+.titulo-formulario h4 {
+    color: #7900ff;
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Campo de entrada */
+.input-campo {
+    margin-bottom: 25px;
+}
+
+.input-campo label {
+    display: block;
+    color: #b3b3b3;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.input-campo input {
+    width: 100%;
+    height: 45px;
+    padding: 0 12px;
+    background-color: #292929;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    box-shadow: none !important;
+    margin: 0;
+}
+
+.input-campo input:focus {
+    border: 1px solid #7900ff !important;
+    box-shadow: 0 0 5px rgba(121, 0, 255, 0.3) !important;
+}
+
+.input-campo input::placeholder {
+    color: #888;
+}
+
+/* Botão salvar */
+.btn-salvar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background-color: #7900ff;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: 0.2s;
+    box-shadow: none;
+}
+
+.btn-salvar:hover {
+    background-color: #a66aff;
+    box-shadow: none;
+}
+
+.btn-salvar i {
+    font-size: 20px;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    body {
+        padding: 15px;
+    }
+
+    .container-formulario {
+        margin: 20px auto;
+    }
+
+    .card-formulario {
+        padding: 22px;
+    }
+
+    .titulo-formulario h4 {
+        font-size: 1.4rem;
+    }
+}

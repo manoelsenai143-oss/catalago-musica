@@ -4,33 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Utilizador</title>
-    <!-- Liga o CSS externo da pasta static -->
+
+    <!-- Materialize CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- CSS específico desta página -->
     <link rel="stylesheet" href="{{ url_for('static', filename='usuario_home.css') }}">
 </head>
 <body>
 
-    <!-- Menu Lateral com o usuario_id incluído em todos os links -->
-    <div class="sidebar">
-        <h3>Sistema</h3>
+    <!-- Topbar (só aparece em mobile) -->
+    <nav class="topbar hide-on-large-only">
+        <div class="nav-wrapper">
+            <a href="#" data-target="slide-out" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
+            </a>
+            <span class="brand-text">Painel</span>
+        </div>
+    </nav>
 
-        <!-- Link para a própria Home com o ID incluído -->
-        <a href="{{ url_for('usuario_home', usuario_id=usuario_id) }}">Início</a>
+    <!-- Sidebar (fixa em desktop, deslizante em mobile) -->
+    <ul id="slide-out" class="sidenav sidenav-fixed dark-sidenav">
+        <li>
+            <div class="user-view">
+                <div class="brand">
+                    <i class="material-icons medium">headphones</i>
+                    <h5>Sistema</h5>
+                </div>
+            </div>
+        </li>
 
-        <!-- Link para as Músicas com o ID incluído -->
-        <a href="{{ url_for('listar_musicas', usuario_id=usuario_id) }}">Músicas</a>
+        <li>
+            <a href="{{ url_for('usuario_home', usuario_id=usuario_id) }}"
+               class="waves-effect nav-link active">
+                <i class="material-icons">home</i>
+                Início
+            </a>
+        </li>
 
-        <!-- Link para as Playlists com o ID incluído -->
-        <a href="{{ url_for('listar_playlists', usuario_id=usuario_id) }}">Playlists</a>
+        <li>
+            <a href="{{ url_for('listar_musicas', usuario_id=usuario_id) }}"
+               class="waves-effect nav-link">
+                <i class="material-icons">library_music</i>
+                Músicas
+            </a>
+        </li>
 
-        <!-- Botão de Terminar Sessão (este não precisa de ID porque vai para o login geral) -->
-        <a href="{{ url_for('login_usuario') }}" class="botao-sair">Terminar Sessão</a>
-    </div>
+        <li>
+            <a href="{{ url_for('listar_playlists', usuario_id=usuario_id) }}"
+               class="waves-effect nav-link">
+                <i class="material-icons">queue_music</i>
+                Playlists
+            </a>
+        </li>
 
-    <!-- Conteúdo do Painel -->
-    <div class="main-content">
-        <h1>Bem-vindo ao seu Painel!</h1>
-        <p>Gerencie as suas músicas e playlists favoritas por aqui.</p>
-    </div>
+        <li><div class="divider"></div></li>
 
+        <li>
+            <a href="{{ url_for('login_usuario') }}"
+               class="waves-effect botao-sair">
+                <i class="material-icons">logout</i>
+                Terminar Sessão
+            </a>
+        </li>
+    </ul>
+
+    <!-- Conteúdo principal -->
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <div class="card dark-card z-depth-2">
+                <div class="card-content">
+                    <h1 class="titulo">
+                        <i class="material-icons medium">waving_hand</i>
+                        Bem-vindo ao seu Painel!
+                    </h1>
+
+                    <!-- Atalhos rápidos (opcional, estilo Materialize) -->
+                    <div class="row atalhos">
+                        <div class="col s12 m6">
+                            <a href="{{ url_for('listar_musicas', usuario_id=usuario_id) }}"
+                               class="btn-large waves-effect waves-light btn-atalho">
+                                <i class="material-icons left">library_music</i>
+                                Ver Músicas
+                            </a>
+                        </div>
+                        <div class="col s12 m6">
+                            <a href="{{ url_for('listar_playlists', usuario_id=usuario_id) }}"
+                               class="btn-large waves-effect waves-light btn-atalho">
+                                <i class="material-icons left">queue_music</i>
+                                Ver Playlists
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidenavs = document.querySelectorAll('.sidenav');
+            M.Sidenav.init(sidenavs, { edge: 'left' });
+        });
+    </script>
 </body>
 </html>

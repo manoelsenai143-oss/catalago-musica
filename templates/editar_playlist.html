@@ -1,30 +1,70 @@
+
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Editar Playlist</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='playlists.css') }}">
+
+    <!-- Materialize CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- CSS personalizado -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='editar_playlist.css') }}">
 </head>
+
 <body>
 
-    <!-- Link para voltar às playlists -->
-    <a href="{{ url_for('listar_playlists', usuario_id=usuario_id) }}" class="link-voltar">← Voltar às Playlists</a>
+    <div class="container-formulario">
 
-    <div style="max-width: 400px; margin: 40px auto; background: #181818; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-        <h1 style="color: #ffffff; margin-top: 0; margin-bottom: 20px; font-size: 1.5em;">Editar Playlist</h1>
+        <!-- Voltar -->
+        <a href="{{ url_for('listar_playlists', usuario_id=usuario_id) }}"
+           class="link-voltar">
+            <i class="material-icons">arrow_back</i>
+            Voltar às Playlists
+        </a>
 
-        <form method="POST">
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; color: #b3b3b3; font-weight: bold;">Nome da Playlist:</label>
-                <input type="text" name="nome_playlist" value="{{ playlist.nome_playlist }}" required style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box;">
+        <!-- Formulário -->
+        <div class="card-formulario">
+
+            <div class="titulo-formulario">
+                <i class="material-icons">edit_note</i>
+                <h4>Editar Playlist</h4>
             </div>
 
-            <button type="submit" style="background: #1db954; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1em;">
-                Salvar Alterações
-            </button>
-        </form>
+            <form method="POST">
+
+                <div class="input-campo">
+                    <label for="nome_playlist">Nome da Playlist</label>
+
+                    <input
+                        type="text"
+                        id="nome_playlist"
+                        name="nome_playlist"
+                        value="{{ playlist.nome_playlist }}"
+                        required
+                        placeholder="Digite o nome da playlist">
+                </div>
+
+                <button type="submit" class="btn-salvar">
+                    <i class="material-icons left">save</i>
+                    Salvar Alterações
+                </button>
+
+            </form>
+
+        </div>
+
     </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
 </body>
 </html>

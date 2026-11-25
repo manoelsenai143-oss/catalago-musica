@@ -2,22 +2,63 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escolher Tipo de Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Materialize CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- CSS específico desta página -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
 </head>
-<body style="background-color: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
-    <div style="background-color: #181818; padding: 40px; border-radius: 10px; width: 380px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-        <h2 style="margin-bottom: 25px; color: #fff;">Escolha o seu Perfil</h2>
+<body>
 
-        <!-- Botão Admin -->
-        <a href="/login/admin" style="display: block; width: 100%; padding: 12px; margin-bottom: 12px; background-color: #e74c3c; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">🛡️ Administrador</a>
+    <div class="container">
+        <div class="row">
+            <div class="col s12 m8 offset-m2 l6 offset-l3">
 
-        <!-- Botão Músico -->
-        <a href="/login/musico" style="display: block; width: 100%; padding: 12px; margin-bottom: 12px; background-color: #f39c12; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">🎸 Músico (CPF)</a>
+                <div class="card dark-card z-depth-3">
+                    <div class="card-content center-align">
 
-        <!-- Botão Utilizador -->
-        <a href="/login/usuario" style="display: block; width: 100%; padding: 12px; margin-bottom: 20px; background-color: #1db954; color: #fff; text-decoration: none; border-radius: 5px; font-weight: bold;">👤 Utilizador</a>
+                        <h4 class="white-text titulo-escolha">
+                            <i class="material-icons medium">account_circle</i>
+                            <br>
+                            Escolha o seu Perfil
+                        </h4>
 
+                        <p class="subtitulo">Selecione o tipo de conta para continuar</p>
+
+                        <!-- Admin -->
+                        <a href="/login/admin"
+                           class="btn-large waves-effect waves-light btn-role">
+                            <i class="material-icons left">admin_panel_settings</i>
+                            Administrador
+                        </a>
+
+                        <!-- Músico -->
+                        <a href="/login/musico"
+                           class="btn-large waves-effect waves-light btn-role">
+                            <i class="material-icons left">music_note</i>
+                            Músico (CPF)
+                        </a>
+
+                        <!-- Utilizador -->
+                        <a href="/login/usuario"
+                           class="btn-large waves-effect waves-light btn-role">
+                            <i class="material-icons left">person</i>
+                            Utilizador
+                        </a>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>

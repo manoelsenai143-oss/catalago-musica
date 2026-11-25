@@ -1,50 +1,235 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Painel do Administrador</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- MATERIALIZE CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- MATERIAL ICONS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+
+    <!-- CSS PRÓPRIO -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='admin.css') }}">
 </head>
-<body style="background-color: #121212; color: #fff; font-family: Arial, sans-serif; padding: 40px; margin: 0;">
-    <div style="max-width: 900px; margin: auto; background: #181818; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
 
-        <!-- Cabeçalho -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 30px;">
-            <h2 style="color: #e74c3c; margin: 0;">🛡️ Painel de Administração</h2>
-            <a href="{{ url_for('logout') }}" style="background: #333; color: #fff; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 0.9rem;">Sair</a>
+<body>
+
+    <main class="pagina-admin">
+
+        <div class="painel">
+
+            <!-- CABEÇALHO -->
+            <header class="cabecalho">
+
+                <div class="titulo-admin">
+
+                    <div class="icone-admin">
+                        <i class="material-icons">admin_panel_settings</i>
+                    </div>
+
+                    <div>
+                        <h1>Painel de Administração</h1>
+                        <p>Gerencie e acompanhe sua plataforma</p>
+                    </div>
+
+                </div>
+
+                <a href="{{ url_for('logout') }}" class="btn-sair">
+                    <i class="material-icons">logout</i>
+                    Sair
+                </a>
+
+            </header>
+
+
+            <!-- ESTATÍSTICAS -->
+            <section class="secao-estatisticas">
+
+                <div class="titulo-secao">
+                    <i class="material-icons">analytics</i>
+                    <h2>Estatísticas Gerais</h2>
+                </div>
+
+                <div class="estatisticas">
+
+                    <!-- USUÁRIOS -->
+                    <div class="card-estatistica">
+
+                        <div class="icone-estatistica">
+                            <i class="material-icons">people</i>
+                        </div>
+
+                        <div>
+                            <p>Utilizadores</p>
+                            <h3>{{ total_usuarios }}</h3>
+                        </div>
+
+                    </div>
+
+                    <!-- MÚSICOS -->
+                    <div class="card-estatistica">
+
+                        <div class="icone-estatistica">
+                            <i class="material-icons">person</i>
+                        </div>
+
+                        <div>
+                            <p>Músicos</p>
+                            <h3>{{ total_musicos }}</h3>
+                        </div>
+
+                    </div>
+
+                    <!-- MÚSICAS -->
+                    <div class="card-estatistica">
+
+                        <div class="icone-estatistica">
+                            <i class="material-icons">library_music</i>
+                        </div>
+
+                        <div>
+                            <p>Músicas</p>
+                            <h3>{{ total_musicas }}</h3>
+                        </div>
+
+                    </div>
+
+                    <!-- ÁLBUNS -->
+                    <div class="card-estatistica">
+
+                        <div class="icone-estatistica">
+                            <i class="material-icons">album</i>
+                        </div>
+
+                        <div>
+                            <p>Álbuns</p>
+                            <h3>{{ total_albuns }}</h3>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- GESTÃO DA PLATAFORMA -->
+            <section class="secao-gestao">
+
+                <div class="titulo-secao">
+                    <i class="material-icons">settings</i>
+                    <h2>Gestão da Plataforma</h2>
+                </div>
+
+                <div class="opcoes-gestao">
+
+                    <!-- GÊNEROS -->
+                    <a href="{{ url_for('admin_gerenciar_generos') }}"
+                       class="card-gestao">
+
+                        <div class="icone-gestao">
+                            <i class="material-icons">music_note</i>
+                        </div>
+
+                        <div class="texto-gestao">
+                            <h3>Gerir Gêneros</h3>
+                            <p>Gerencie os gêneros musicais</p>
+                        </div>
+
+                        <i class="material-icons seta">arrow_forward</i>
+
+                    </a>
+
+
+                    <!-- USUÁRIOS -->
+                    <a href="{{ url_for('admin_listar_usuarios') }}"
+                       class="card-gestao">
+
+                        <div class="icone-gestao">
+                            <i class="material-icons">people</i>
+                        </div>
+
+                        <div class="texto-gestao">
+                            <h3>Gerir Usuários</h3>
+                            <p>Visualize e gerencie os usuários</p>
+                        </div>
+
+                        <i class="material-icons seta">arrow_forward</i>
+
+                    </a>
+
+
+                    <!-- MÚSICOS -->
+                    <a href="{{ url_for('admin_listar_musicos') }}"
+                       class="card-gestao">
+
+                        <div class="icone-gestao">
+                            <i class="material-icons">person</i>
+                        </div>
+
+                        <div class="texto-gestao">
+                            <h3>Gerir Músicos</h3>
+                            <p>Gerencie os músicos cadastrados</p>
+                        </div>
+
+                        <i class="material-icons seta">arrow_forward</i>
+
+                    </a>
+
+
+                    <!-- MÚSICAS -->
+                    <a href="{{ url_for('admin_listar_todas_musicas') }}"
+                       class="card-gestao">
+
+                        <div class="icone-gestao">
+                            <i class="material-icons">library_music</i>
+                        </div>
+
+                        <div class="texto-gestao">
+                            <h3>Gerir Músicas</h3>
+                            <p>Visualize todas as músicas</p>
+                        </div>
+
+                        <i class="material-icons seta">arrow_forward</i>
+
+                    </a>
+
+
+                    <!-- ÁLBUNS -->
+                    <a href="{{ url_for('admin_listar_todos_albuns') }}"
+                       class="card-gestao">
+
+                        <div class="icone-gestao">
+                            <i class="material-icons">album</i>
+                        </div>
+
+                        <div class="texto-gestao">
+                            <h3>Gerir Álbuns</h3>
+                            <p>Visualize todos os álbuns</p>
+                        </div>
+
+                        <i class="material-icons seta">arrow_forward</i>
+
+                    </a>
+
+                </div>
+
+            </section>
+
         </div>
 
-        <!-- Estatísticas da Plataforma -->
-        <h3 style="color: #b3b3b3; margin-bottom: 15px; font-size: 1.1rem;">Estatísticas Gerais</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px;">
-            <div style="background: #222; padding: 20px; border-radius: 8px; text-align: center; border-top: 4px solid #1db954;">
-                <p style="margin: 0; color: #b3b3b3; font-size: 0.9rem;">Utilizadores</p>
-                <h2 style="margin: 10px 0 0 0; color: #fff; font-size: 2rem;">{{ total_usuarios }}</h2>
-            </div>
-            <div style="background: #222; padding: 20px; border-radius: 8px; text-align: center; border-top: 4px solid #f39c12;">
-                <p style="margin: 0; color: #b3b3b3; font-size: 0.9rem;">Músicos</p>
-                <h2 style="margin: 10px 0 0 0; color: #fff; font-size: 2rem;">{{ total_musicos }}</h2>
-            </div>
-            <div style="background: #222; padding: 20px; border-radius: 8px; text-align: center; border-top: 4px solid #3498db;">
-                <p style="margin: 0; color: #b3b3b3; font-size: 0.9rem;">Músicas</p>
-                <h2 style="margin: 10px 0 0 0; color: #fff; font-size: 2rem;">{{ total_musicas }}</h2>
-            </div>
-            <div style="background: #222; padding: 20px; border-radius: 8px; text-align: center; border-top: 4px solid #9b59b6;">
-                <p style="margin: 0; color: #b3b3b3; font-size: 0.9rem;">Álbuns</p>
-                <h2 style="margin: 10px 0 0 0; color: #fff; font-size: 2rem;">{{ total_albuns }}</h2>
-            </div>
-        </div>
+    </main>
 
-        <!-- Gestão do Sistema (Botões de Ação) -->
-        <h3 style="color: #b3b3b3; margin-bottom: 15px; font-size: 1.1rem;">Gestão da Plataforma</h3>
-        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-            <a href="{{ url_for('admin_gerenciar_generos') }}" style="background: #3498db; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; flex: 1; min-width: 150px;">🎵 Gerir Géneros</a>
-            <a href="{{ url_for('admin_listar_usuarios') }}" style="background: #1db954; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; flex: 1; min-width: 150px;">👥 Gerir Utilizadores</a>
-            <a href="{{ url_for('admin_listar_musicos') }}" style="background: #f39c12; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; flex: 1; min-width: 150px;">🎸 Gerir Músicos</a>
-            <a href="{{ url_for('admin_listar_todas_musicas') }}" style="background: #9b59b6; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; flex: 1; min-width: 150px;">🎶 Gerir Músicas</a>
-            <a href="{{ url_for('admin_listar_todos_albuns') }}" style="background: #9b59b6; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; flex: 1; min-width: 150px;">💿 Gerir Álbuns</a>
-        </div>
+    <!-- MATERIALIZE JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-    </div>
 </body>
 </html>

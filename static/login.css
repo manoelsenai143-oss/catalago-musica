@@ -1,0 +1,93 @@
+/* ===== Variáveis (padronizadas — igual às outras páginas) ===== */
+:root {
+    --bg-body:   #121212;
+    --bg-card:   #1e1e1e;
+    --text-main: #ffffff;
+    --text-mute: #b0b0b0;
+    --accent:    #6200ee;    /* ROXO — padronizado */
+    --accent-hv: #7c3aed;
+}
+
+/* ===== Body ===== */
+body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 20px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color-scheme: dark;
+}
+
+/* ===== Card ===== */
+.dark-card {
+    background-color: var(--bg-card) !important;
+    border-radius: 14px !important;
+    margin: 0;
+}
+.dark-card .card-content { padding: 40px 32px !important; }
+
+/* ===== Título ===== */
+.titulo-escolha {
+    font-weight: 600;
+    margin: 0 0 8px;
+    line-height: 1.4;
+}
+.titulo-escolha .material-icons.medium {
+    color: var(--accent);
+}
+
+.subtitulo {
+    color: var(--text-mute);
+    font-size: 0.9rem;
+    margin: 0 0 28px;
+}
+
+/* ===== Botões de perfil ===== */
+.btn-role {
+    width: 100% !important;
+    background-color: var(--accent) !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: none;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 20px !important;
+    transition: background .2s ease, transform .15s ease;
+    box-shadow:
+        0 1px 2px rgba(0,0,0,.4),
+        0 4px 12px rgba(98, 0, 238, .25);
+}
+
+.btn-role:last-of-type { margin-bottom: 0; }
+
+.btn-role:hover {
+    background-color: var(--accent-hv) !important;
+    box-shadow:
+        0 2px 4px rgba(0,0,0,.4),
+        0 6px 20px rgba(98, 0, 238, .45);
+}
+
+.btn-role:active {
+    transform: translateY(1px);
+}
+
+.btn-role .material-icons.left {
+    margin-right: 14px;
+    margin-left: 0;
+    color: #ffffff;
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 600px) {
+    .dark-card .card-content { padding: 28px 20px !important; }
+    .titulo-escolha           { font-size: 1.3rem; }
+    .btn-role                 { font-size: 0.9rem; }
+}
