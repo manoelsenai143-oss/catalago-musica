@@ -110,7 +110,7 @@
                             <tr>
                                 <td>{{ musica.id }}</td>
 
-                                <!-- Título atualizado com capa, player de preview e link do Spotify -->
+                                <!-- Título com capa e mini player do Spotify integrado -->
                                 <td class="titulo-musica">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         {% if musica.capa_url %}
@@ -119,20 +119,14 @@
                                         <div>
                                             <span>{{ musica.titulo }}</span>
 
-                                            <!-- Player de pré-visualização (30s), caso exista no objeto -->
-                                            {% if musica.preview_url %}
-                                                <div style="margin-top: 4px;">
-                                                    <audio controls style="height: 22px; width: 160px;">
-                                                        <source src="{{ musica.preview_url }}" type="audio/mpeg">
-                                                    </audio>
-                                                </div>
-                                            {% endif %}
-
                                             {% if musica.spotify_url %}
-                                                <br>
-                                                <a href="{{ musica.spotify_url }}" target="_blank" style="color: #1db954; font-size: 0.75rem; text-decoration: none; display: inline-flex; align-items: center; gap: 2px;">
-                                                    <i class="material-icons" style="font-size: 12px;">play_circle_filled</i> Ouvir no Spotify
-                                                </a>
+                                                {% set spotify_id = musica.spotify_url.split('/')[-1].split('?')[0] %}
+                                                <div style="margin-top: 6px;">
+                                                    <iframe src="https://open.spotify.com/embed/track/{{ spotify_id }}?utm_source=generator&theme=0"
+                                                            width="260" height="80" style="border-radius: 12px; border: none;"
+                                                            allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                                            loading="lazy"></iframe>
+                                                </div>
                                             {% endif %}
                                         </div>
                                     </div>

@@ -1,217 +1,188 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Os Meus Álbuns - Painel do Músico</title>
 
-    <title>Meus Álbuns - Painel do Músico</title>
-
-    <!-- MATERIALIZE CSS -->
+    <!-- Materialize CSS -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-
-    <!-- MATERIAL ICONS -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-          rel="stylesheet">
-
-    <!-- DATATABLES CSS -->
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- DataTables CSS -->
     <link rel="stylesheet"
           href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
-    <!-- CSS PRÓPRIO -->
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='listar_album.css') }}">
+    <!-- CSS específico desta página -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='listar_musicas.css') }}">
 </head>
-
 <body>
 
-    <!-- BARRA LATERAL -->
-    <aside class="sidebar">
-
-        <div>
-            <div class="logo">
-                <i class="material-icons">music_note</i>
-                <span>Sistema</span>
-            </div>
-
-            <div class="menu">
-
-                <a href="{{ url_for('musico_home', musico_id=musico_id) }}">
-                    <i class="material-icons">home</i>
-                    Início
-                </a>
-
-                <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}">
-                    <i class="material-icons">library_music</i>
-                    Músicas
-                </a>
-
-                <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}"
-                   class="ativo">
-                    <i class="material-icons">album</i>
-                    Álbuns
-                </a>
-
-            </div>
+    <!-- Topbar (mobile) -->
+    <nav class="topbar hide-on-large-only">
+        <div class="nav-wrapper">
+            <a href="#" data-target="slide-out" class="sidenav-trigger">
+                <i class="material-icons">menu</i>
+            </a>
+            <span class="brand-text">Os Meus Álbuns</span>
         </div>
+    </nav>
 
-        <!-- SAIR -->
-        <div class="sair">
-            <a href="{{ url_for('logout') }}">
+    <!-- Sidebar -->
+    <ul id="slide-out" class="sidenav sidenav-fixed dark-sidenav">
+        <li>
+            <div class="user-view">
+                <div class="brand">
+                    <i class="material-icons medium">music_note</i>
+                    <h5>Sistema</h5>
+                </div>
+            </div>
+        </li>
+
+        <li>
+            <a href="{{ url_for('musico_home', musico_id=musico_id) }}"
+               class="waves-effect nav-link">
+                <i class="material-icons">home</i>
+                Início
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('musico_listar_musicas', musico_id=musico_id) }}"
+               class="waves-effect nav-link">
+                <i class="material-icons">library_music</i>
+                Músicas
+            </a>
+        </li>
+        <li>
+            <a href="{{ url_for('musico_listar_albuns', musico_id=musico_id) }}"
+               class="waves-effect nav-link active">
+                <i class="material-icons">album</i>
+                Álbuns
+            </a>
+        </li>
+
+        <li><div class="divider"></div></li>
+
+        <li>
+            <a href="{{ url_for('logout') }}"
+               class="waves-effect botao-sair">
                 <i class="material-icons">logout</i>
                 Terminar Sessão
             </a>
-        </div>
+        </li>
+    </ul>
 
-    </aside>
+    <!-- Conteúdo principal -->
+    <main class="main-content">
+        <div class="content-wrapper">
 
+            <!-- Cabeçalho -->
+            <div class="header-row">
+                <h4 class="titulo">
+                    <i class="material-icons medium">album</i>
+                    Os Meus Álbuns
+                </h4>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <main class="conteudo">
-
-        <!-- CABEÇALHO -->
-        <div class="topo">
-
-            <div>
-                <h1>Meus Álbuns</h1>
-                <p>Gerencie seus álbuns cadastrados no sistema</p>
+                <a href="{{ url_for('musico_cadastrar_album', musico_id=musico_id) }}"
+                   class="btn-large waves-effect waves-light btn-nova">
+                    <i class="material-icons left">add</i>
+                    Novo Álbum
+                </a>
             </div>
 
-            <a href="{{ url_for('musico_cadastrar_album', musico_id=musico_id) }}"
-               class="btn-novo">
+            <!-- Card com a tabela -->
+            <div class="card dark-card z-depth-2">
+                <div class="card-content">
 
-                <i class="material-icons">add</i>
-                Novo Álbum
+                    <table id="tabelaAlbuns" class="display" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome do Álbum</th>
+                                <th>Ano</th>
+                                <th>Músicas</th>
+                                <th class="th-acoes">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for album in albuns %}
+                            <tr>
+                                <td>{{ album.id }}</td>
+                                
+                                <!-- Nome do Álbum com Capa Dinâmica -->
+                                <td class="titulo-musica">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        {% if album.capa_url %}
+                                            <img src="{{ album.capa_url }}" alt="Capa" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover;">
+                                        {% endif %}
+                                        <span>{{ album.nome_album }}</span>
+                                    </div>
+                                </td>
 
-            </a>
-
-        </div>
-
-
-        <!-- CARD DA TABELA -->
-        <section class="card-tabela">
-
-            <div class="titulo-tabela">
-                <i class="material-icons">album</i>
-                <h5>Álbuns cadastrados</h5>
-            </div>
-
-            <div class="tabela-container">
-
-                <table id="tabelaAlbuns" class="display">
-
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome do Álbum</th>
-                            <th>Ano</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        {% for album in albuns %}
-
-                        <tr>
-
-                            <td>{{ album.id_album }}</td>
-
-                            <td class="nome-album">
-                                {{ album.nome_album }}
-                            </td>
-
-                            <td>
-                                {{ album.ano_album if album.ano_album else 'N/D' }}
-                            </td>
-
-                            <td>
-
-                                <div class="acoes">
-
-                                    <!-- EDITAR -->
-                                    <a href="{{ url_for('atualizar_album', musico_id=musico_id, id_album=album.id_album) }}"
-                                       class="btn-editar">
-
+                                <td>{{ album.ano_album if album.ano_album else 'N/D' }}</td>
+                                <td>
+                                    <span class="new badge purple darken-2" data-badge-caption="faixas" style="float: none; margin-left: 0;">
+                                        {{ album.total_musicas }}
+                                    </span>
+                                </td>
+                                <td class="acoes">
+                                    <!-- Editar -->
+                                    <a href="{{ url_for('atualizar_album', musico_id=musico_id, id_album=album.id) }}"
+                                       class="btn-small waves-effect btn-editar tooltipped"
+                                       data-position="top" data-tooltip="Editar">
                                         <i class="material-icons">edit</i>
-                                        Editar
-
                                     </a>
 
-                                    <!-- EXCLUIR -->
-                                    <form action="{{ url_for('musico_excluir_album', musico_id=musico_id, id_album=album.id_album) }}"
-                                          method="POST"
-                                          onsubmit="return confirm('Atenção: Ao excluir este álbum, todas as músicas relacionadas a ele também serão excluídas permanentemente. Deseja continuar?')">
-
-                                        <button type="submit" class="btn-excluir">
-
+                                    <!-- Excluir -->
+                                    <form action="{{ url_for('musico_excluir_album', musico_id=musico_id, id_album=album.id) }}"
+                                          method="POST" class="form-inline">
+                                        <button type="submit"
+                                                class="btn-small waves-effect btn-excluir tooltipped"
+                                                data-position="top" data-tooltip="Excluir"
+                                                onclick="return confirm('Tem certeza de que deseja excluir este álbum? As músicas associadas também serão afetadas.')">
                                             <i class="material-icons">delete</i>
-                                            Excluir
-
                                         </button>
-
                                     </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
 
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
+                </div>
             </div>
 
-        </section>
-
+        </div>
     </main>
 
-
-    <!-- JQUERY -->
+    <!-- jQuery + DataTables -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
-    <!-- MATERIALIZE JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-
-    <!-- DATATABLES JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-    <!-- CONFIGURAÇÃO DATATABLES -->
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar
+            M.Sidenav.init(document.querySelectorAll('.sidenav'), { edge: 'left' });
 
-        $(document).ready(function() {
-
+            // DataTables
             $('#tabelaAlbuns').DataTable({
-
-                language: {
-                    url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json"
                 },
-
-                pageLength: 10,
-
-                autoWidth: false,
-
-                scrollX: false,
-
-                order: [[0, 'asc']],
-
-                columnDefs: [
-                    {
-                        orderable: false,
-                        targets: 3
-                    }
-                ]
-
+                "columnDefs": [
+                    { "orderable": false, "targets": 4, "className": "acoes-col" }
+                ],
+                "order": [[0, 'asc']]
             });
 
+            // Tooltips
+            document.querySelectorAll('.tooltipped').forEach(el => {
+                M.Tooltip.init(el, { enterDelay: 300 });
+            });
         });
-
     </script>
-
 </body>
-</html>
+</html>d

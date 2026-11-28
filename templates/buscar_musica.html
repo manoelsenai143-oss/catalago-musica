@@ -41,23 +41,45 @@
                 <table id="tabelaMusicas" class="display nowrap" style="width:100%">
                     <thead>
                         <tr>
+                            <th>Capa</th>
                             <th>ID</th>
                             <th>Título</th>
                             <th>Duração</th>
                             <th>Artista</th>
                             <th>Álbum</th>
                             <th>Género</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for musica in musicas %}
                         <tr>
+                            <td>
+                                {% if musica.capa_url %}
+                                <img src="{{ musica.capa_url }}" alt="Capa" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover;">
+                                {% else %}
+                                <div style="width: 40px; height: 40px; background: #333; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="material-icons" style="font-size: 20px; color: #777;">music_note</i>
+                                </div>
+                                {% endif %}
+                            </td>
                             <td>{{ musica.id }}</td>
                             <td>{{ musica.titulo }}</td>
                             <td>{{ musica.duracao }}</td>
                             <td>{{ musica.artista if musica.artista else 'N/A' }}</td>
                             <td>{{ musica.album if musica.album else 'N/A' }}</td>
                             <td>{{ musica.genero }}</td>
+                            <td>
+                                {% if musica.spotify_url %}
+                                <button type="button" class="btn-small waves-effect waves-light btn-tocar"
+                                        data-spotify-url="{{ musica.spotify_url }}"
+                                        style="background-color: #1db954; display: inline-flex; align-items: center; gap: 4px;">
+                                    <i class="material-icons tiny">play_arrow</i> Tocar
+                                </button>
+                                {% else %}
+                                <span class="grey-text text-darken-1" style="font-size: 0.85rem;">Indisponível</span>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -68,6 +90,14 @@
 
     </div>
 
+    <!-- Modal / Player Flutuante Arrastável -->
+    <div id="modalPlayer" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: #121212; padding: 10px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.7); cursor: grab;">
+        <div id="playerHeader" style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
+            <button onclick="fecharPlayer()" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 16px;">✖</button>
+        </div>
+        <div id="spotifyEmbedContainer"></div>
+    </div>
+
     <!-- jQuery + DataTables -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -75,7 +105,7 @@
     <!-- Materialize JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-    <!-- Ativação do DataTables -->
+    <!-- Ativação do DataTables, Lógica do Player e Arrastar (Drag) -->
     <script>
         $(document).ready(function() {
             $('#tabelaMusicas').DataTable({
@@ -83,9 +113,75 @@
                     "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-PT.json"
                 },
                 "pageLength": 10,
-                "order": [[0, 'asc']],
+                "order": [[1, 'asc']],
                 "responsive": true
             });
+
+            $('#tabelaMusicas tbody').on('click', '.btn-tocar', function() {
+                const spotifyUrl = $(this).data('spotify-url');
+                if (!spotifyUrl) return;
+
+                let embedUrl = spotifyUrl.replace('open.spotify.com/', 'open.spotify.com/embed/');
+                if (!embedUrl.includes('?')) {
+                    embedUrl += '?utm_source=generator&theme=0';
+                }
+
+                const container = document.getElementById('spotifyEmbedContainer');
+                container.innerHTML = `<iframe src="${embedUrl}" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+
+                const modal = document.getElementById('modalPlayer');
+                modal.style.display = 'block';
+            });
+        });
+
+        function fecharPlayer() {
+            document.getElementById('modalPlayer').style.display = 'none';
+            document.getElementById('spotifyEmbedContainer').innerHTML = '';
+        }
+
+        // Lógica para arrastar o player pela tela
+        const modalPlayer = document.getElementById('modalPlayer');
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        modalPlayer.addEventListener('mousedown', function(e) {
+            // Se clicar no botão de fechar ou no iframe do player, não inicia o arraste
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'IFRAME') return;
+
+            isDragging = true;
+            modalPlayer.style.cursor = 'grabbing';
+
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const rect = modalPlayer.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+
+            // Transforma o posicionamento fixo baseado em bottom/right para left/top
+            modalPlayer.style.bottom = 'auto';
+            modalPlayer.style.right = 'auto';
+            modalPlayer.style.left = initialLeft + 'px';
+            modalPlayer.style.top = initialTop + 'px';
+
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+
+            modalPlayer.style.left = (initialLeft + dx) + 'px';
+            modalPlayer.style.top = (initialTop + dy) + 'px';
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                modalPlayer.style.cursor = 'grab';
+            }
         });
     </script>
 </body>

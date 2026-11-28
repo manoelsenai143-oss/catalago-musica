@@ -68,7 +68,14 @@
                                         <small style="color: #aaa;">{{ track.artista }} • ⏱️ {{ track.duracao }}</small>
                                     </div>
                                 </div>
-                                <button type="button" class="btn-small waves-effect" style="background-color: #1db954;" onclick="preencherSpotify('{{ track.titulo }}', '{{ track.duracao }}', '{{ track.album }}', '{{ track.capa }}', '{{ track.link_spotify }}')">
+                                <!-- Botão seguro com atributos data-* -->
+                                <button type="button" class="btn-small waves-effect btn-usar-spotify"
+                                        data-titulo="{{ track.titulo }}"
+                                        data-duracao="{{ track.duracao }}"
+                                        data-album="{{ track.album }}"
+                                        data-capa="{{ track.capa }}"
+                                        data-spotify="{{ track.link_spotify }}"
+                                        style="background-color: #1db954;">
                                     Usar
                                 </button>
                             </li>
@@ -218,6 +225,14 @@
                     document.getElementById('helper-genero').textContent = '';
                 }
             });
+
+            // Event listener seguro para os botões "Usar" do Spotify
+            document.querySelectorAll('.btn-usar-spotify').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const d = this.dataset;
+                    preencherSpotify(d.titulo, d.duracao, d.album, d.capa, d.spotify);
+                });
+            });
         });
 
         // Máscara de duração: "0345" → "03:45"
@@ -228,7 +243,7 @@
             input.value = v;
         }
 
-        // Função JS atualizada para recolher capa e link do Spotify
+        // Função JS atualizada para recolher capa e link do Spotify com segurança
         function preencherSpotify(titulo, duracao, nomeAlbum, capaUrl, spotifyUrl) {
             document.getElementById('titulo').value = titulo;
             document.getElementById('duracao').value = duracao;
@@ -259,7 +274,7 @@
             } else {
                 selectAlbum.selectedIndex = 0;
                 if (nomeAlbum && nomeAlbum.trim() !== '') {
-                    opcaoPadrao.text = `✨ Criar Álbum do Spotify: ${nomeAlbum}`;
+                    opcaoPadrao.text = nomeAlbum;
                 } else {
                     opcaoPadrao.text = '— Single (Sem Álbum) —';
                 }

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -62,6 +61,7 @@
 
                 <thead>
                     <tr>
+                        <th>Capa</th>
                         <th>Título da Música</th>
                         <th>Artista</th>
                         <th>Álbum</th>
@@ -75,6 +75,15 @@
                     {% if musicas_playlist %}
                         {% for musica in musicas_playlist %}
                         <tr>
+                            <td>
+                                {% if musica.capa_url %}
+                                <img src="{{ musica.capa_url }}" alt="Capa" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover;">
+                                {% else %}
+                                <div style="width: 40px; height: 40px; background: #333; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="material-icons" style="font-size: 20px; color: #777;">music_note</i>
+                                </div>
+                                {% endif %}
+                            </td>
                             <td>{{ musica.titulo }}</td>
                             <td>{{ musica.artista }}</td>
                             <td>{{ musica.album }}</td>
@@ -82,17 +91,28 @@
                             <td>{{ musica.duracao }}</td>
 
                             <td class="coluna-acoes">
-                                <form
-                                    action="{{ url_for('remover_musica_playlist', usuario_id=usuario_id, playlist_id=playlist.id_playlist, musica_id=musica.id_musica) }}"
-                                    method="POST"
-                                    onsubmit="return confirm('Tens a certeza que queres remover esta música da playlist?');">
-
-                                    <button type="submit" class="btn-remover">
-                                        <i class="material-icons">remove_circle</i>
-                                        Remover
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    {% if musica.spotify_url %}
+                                    <button type="button" class="btn-small waves-effect waves-light btn-tocar"
+                                            data-spotify-url="{{ musica.spotify_url }}"
+                                            style="background-color: #1db954; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="material-icons tiny">play_arrow</i> Tocar
                                     </button>
+                                    {% endif %}
 
-                                </form>
+                                    <form
+                                        action="{{ url_for('remover_musica_playlist', usuario_id=usuario_id, playlist_id=playlist.id_playlist, musica_id=musica.id_musica) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Tens a certeza que queres remover esta música da playlist?');"
+                                        style="margin: 0;">
+
+                                        <button type="submit" class="btn-remover">
+                                            <i class="material-icons">remove_circle</i>
+                                            Remover
+                                        </button>
+
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -105,6 +125,14 @@
 
     </div>
 
+    <!-- Modal / Player Flutuante Arrastável -->
+    <div id="modalPlayer" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: #121212; padding: 10px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.7); cursor: grab;">
+        <div id="playerHeader" style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
+            <button onclick="fecharPlayer()" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 16px;">✖</button>
+        </div>
+        <div id="spotifyEmbedContainer"></div>
+    </div>
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
@@ -114,7 +142,7 @@
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-    <!-- Configuração DataTables -->
+    <!-- Configuração DataTables e Player -->
     <script>
         $(document).ready(function () {
             $('#tabelaDetalhesPlaylist').DataTable({
@@ -127,10 +155,75 @@
                 columnDefs: [
                     {
                         orderable: false,
-                        targets: 5
+                        targets: [0, 6] // Desativa ordenação na capa e nas ações
                     }
                 ]
             });
+
+            // Ação de abrir o player do Spotify ao clicar em Tocar
+            $('#tabelaDetalhesPlaylist tbody').on('click', '.btn-tocar', function() {
+                const spotifyUrl = $(this).data('spotify-url');
+                if (!spotifyUrl) return;
+
+                let embedUrl = spotifyUrl.replace('open.spotify.com/', 'open.spotify.com/embed/');
+                if (!embedUrl.includes('?')) {
+                    embedUrl += '?utm_source=generator&theme=0';
+                }
+
+                const container = document.getElementById('spotifyEmbedContainer');
+                container.innerHTML = `<iframe src="${embedUrl}" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+
+                const modal = document.getElementById('modalPlayer');
+                modal.style.display = 'block';
+            });
+        });
+
+        function fecharPlayer() {
+            document.getElementById('modalPlayer').style.display = 'none';
+            document.getElementById('spotifyEmbedContainer').innerHTML = '';
+        }
+
+        // Lógica para arrastar o player pela tela
+        const modalPlayer = document.getElementById('modalPlayer');
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        modalPlayer.addEventListener('mousedown', function(e) {
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'IFRAME') return;
+
+            isDragging = true;
+            modalPlayer.style.cursor = 'grabbing';
+
+            startX = e.clientX;
+            startY = e.clientY;
+
+            const rect = modalPlayer.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+
+            modalPlayer.style.bottom = 'auto';
+            modalPlayer.style.right = 'auto';
+            modalPlayer.style.left = initialLeft + 'px';
+            modalPlayer.style.top = initialTop + 'px';
+
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+
+            modalPlayer.style.left = (initialLeft + dx) + 'px';
+            modalPlayer.style.top = (initialTop + dy) + 'px';
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                modalPlayer.style.cursor = 'grab';
+            }
         });
     </script>
 

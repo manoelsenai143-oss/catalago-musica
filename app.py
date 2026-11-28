@@ -585,11 +585,15 @@ def musico_cadastrar_musica(musico_id):
         album_spotify = request.form.get('album_spotify')
         capa_url = request.form.get('capa_url') or None
         spotify_url = request.form.get('spotify_url') or None
+        preview_url = request.form.get('preview_url') or None  # <-- CAPTURA O PREVIEW URL
 
         if not id_album and album_spotify:
+            # Limpa o prefixo do Spotify para guardar apenas o nome limpo na base de dados
+            album_spotify = album_spotify.replace('✨ Criar Álbum do Spotify: ', '').strip()
+
             cursor.execute(
                 'SELECT id_album FROM "ALBUM" WHERE LOWER(nome_album) = LOWER(%s) AND id_artista = %s',
-                (album_spotify.strip(), musico_id)
+                (album_spotify, musico_id)
             )
             album_db = cursor.fetchone()
 
@@ -598,17 +602,17 @@ def musico_cadastrar_musica(musico_id):
             else:
                 cursor.execute(
                     'INSERT INTO "ALBUM" (nome_album, ano_album, id_artista) VALUES (%s, %s, %s) RETURNING id_album',
-                    (album_spotify.strip(), 2026, musico_id)
+                    (album_spotify, 2026, musico_id)
                 )
                 novo_album = cursor.fetchone()
                 id_album = novo_album['id_album']
                 conexao.commit()
 
-        # Insere a música incluindo capa_url e spotify_url
+        # Insere a música incluindo capa_url, spotify_url e preview_url
         cursor.execute('''
-            INSERT INTO "MUSICA" (titulo, "duração", id_album, id_genero, id_artista, capa_url, spotify_url) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        ''', (titulo, duracao, id_album, id_genero, musico_id, capa_url, spotify_url))
+            INSERT INTO "MUSICA" (titulo, "duração", id_album, id_genero, id_artista, capa_url, spotify_url, preview_url) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        ''', (titulo, duracao, id_album, id_genero, musico_id, capa_url, spotify_url, preview_url))
 
         conexao.commit()
         cursor.close()
@@ -633,7 +637,8 @@ def musico_cadastrar_musica(musico_id):
                 'duracao': duracao_formatada,
                 'capa': item['album']['images'][0]['url'] if item['album']['images'] else '',
                 'album': item['album']['name'],
-                'link_spotify': item['external_urls'].get('spotify', '') # URL oficial da faixa
+                'link_spotify': item['external_urls'].get('spotify', ''),
+                'preview_url': item.get('preview_url')  # <-- BUSCA A PRÉVIA DO SPOTIFY
             })
 
     cursor.execute('SELECT * FROM "ALBUM" WHERE id_artista = %s', (musico_id,))
@@ -652,6 +657,8 @@ def musico_cadastrar_musica(musico_id):
         generos=generos,
         resultados_spotify=resultados_spotify
     )
+
+
 
 
 @app.route('/musico/albuns/novo/<int:musico_id>', methods=['GET', 'POST'])
@@ -684,12 +691,17 @@ def musico_listar_albuns(musico_id):
     conexao = criar_conexao()
     cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
-    # Usa o musico_id diretamente como id_artista!
     cursor.execute("""
-        SELECT id_album, nome_album, ano_album 
-        FROM "ALBUM" 
-        WHERE id_artista = %s 
-        ORDER BY id_album ASC
+        SELECT a.id_album, a.id_album AS id, 
+               REPLACE(a.nome_album, '✨ Criar Álbum do Spotify: ', '') AS nome_album, 
+               a.ano_album, 
+               MAX(m.capa_url) AS capa_url,
+               COUNT(m.id_musica) AS total_musicas
+        FROM "ALBUM" a
+        LEFT JOIN "MUSICA" m ON a.id_album = m.id_album
+        WHERE a.id_artista = %s 
+        GROUP BY a.id_album, a.nome_album, a.ano_album
+        ORDER BY a.id_album ASC
     """, (musico_id,))
 
     albuns = cursor.fetchall()
@@ -697,6 +709,8 @@ def musico_listar_albuns(musico_id):
     conexao.close()
 
     return render_template('musico_listar_albuns.html', albuns=albuns, musico_id=musico_id)
+
+
 
 @app.route('/musico/albuns/editar/<int:musico_id>/<int:id_album>', methods=['GET', 'POST'])
 def atualizar_album(musico_id, id_album):
@@ -963,21 +977,21 @@ def cadastrar_musica():
 
 @app.route('/musicas', methods=['GET'])
 def listar_musicas():
-    # 1. Pega o usuario_id que vem por parâmetro no link (ex: /musicas?usuario_id=51)
     usuario_id = request.args.get('usuario_id')
 
     conexao = criar_conexao()
     cursor = conexao.cursor(cursor_factory=RealDictCursor)
 
-    # (A tua query SQL continua exatamente igual...)
     cursor.execute("""
         SELECT 
             m.id_musica AS id,
             m.titulo,
             m."duração" AS duracao,
             COALESCE(art.nome_artista, art_direto.nome_artista, mus.nome, 'Desconhecido') AS artista,
-            COALESCE(al.nome_album, 'Sem Álbum') AS album,
-            g.nome_genero AS genero
+            COALESCE(REPLACE(al.nome_album, '✨ Criar Álbum do Spotify: ', ''), 'Sem Álbum') AS album,
+            g.nome_genero AS genero,
+            m.capa_url,
+            m.spotify_url
         FROM "MUSICA" m
         LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
         LEFT JOIN "ARTISTA" art ON al.id_artista = art.id_artista
@@ -990,12 +1004,10 @@ def listar_musicas():
     cursor.close()
     conexao.close()
 
-    # 2. Passa o usuario_id para o render_template!
     return render_template("buscar_musica.html", musicas=resultados, usuario_id=usuario_id)
 
 
-
-# 5 - Buscar música
+# 5 - Buscar música (apenas UMA versão desta rota)
 @app.route('/musicas/buscar', methods=['GET'])
 def buscar_musica():
     titulo = request.args.get('titulo', '')
@@ -1008,22 +1020,27 @@ def buscar_musica():
             m.id_musica AS id,
             m.titulo,
             m."duração" AS duracao,
-            a.nome_artista AS artista,
-            al.nome_album AS album,
-            g.nome_genero AS genero
+            COALESCE(art.nome_artista, art_direto.nome_artista, mus.nome, 'Desconhecido') AS artista,
+            COALESCE(REPLACE(al.nome_album, '✨ Criar Álbum do Spotify: ', ''), 'Sem Álbum') AS album,
+            g.nome_genero AS genero,
+            m.capa_url,
+            m.spotify_url
         FROM "MUSICA" m
         LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
-        LEFT JOIN "ARTISTA" a ON al.id_artista = a.id_artista
+        LEFT JOIN "ARTISTA" art ON al.id_artista = art.id_artista
+        LEFT JOIN "ARTISTA" art_direto ON m.id_artista = art_direto.id_artista
+        LEFT JOIN musicos mus ON m.id_artista = mus.id
         JOIN "GENERO" g ON m.id_genero = g.id_genero
         WHERE m.titulo ILIKE %s
+        ORDER BY m.id_musica ASC
     """, (f"%{titulo}%",))
 
     resultados = cursor.fetchall()
     cursor.close()
     conexao.close()
 
-    # Reutiliza o template de listagem para mostrar as músicas encontradas
     return render_template("buscar_musica.html", musicas=resultados)
+
 
 @app.route('/usuario/<int:usuario_id>/cadastrar_playlist', methods=['GET'])
 def cadastrar_playlist_form(usuario_id):
@@ -1084,13 +1101,14 @@ def adicionar_musica_playlist(usuario_id, playlist_id):
         conexao.close()
         return redirect(url_for('detalhes_playlist', usuario_id=usuario_id, playlist_id=playlist_id))
 
-    # Consulta SQL robusta que procura o artista pelo álbum, pela ligação direta ou pela tabela de músicos
+    # Consulta SQL atualizada com m.capa_url para carregar as miniaturas
     cursor.execute("""
         SELECT 
             m.id_musica,
             m.titulo,
             COALESCE(ar.nome_artista, art_direto.nome_artista, mus.nome, 'Desconhecido') AS artista,
-            COALESCE(al.nome_album, 'Sem Álbum') AS album
+            COALESCE(al.nome_album, 'Sem Álbum') AS album,
+            m.capa_url
         FROM "MUSICA" m
         LEFT JOIN "ALBUM" al ON m.id_album = al.id_album
         LEFT JOIN "ARTISTA" ar ON al.id_artista = ar.id_artista
@@ -1109,6 +1127,7 @@ def adicionar_musica_playlist(usuario_id, playlist_id):
         playlist_id=playlist_id,
         musicas=musicas
     )
+
 
 
 @app.route('/usuario/<int:usuario_id>/playlist/<int:playlist_id>/excluir', methods=['POST'])
@@ -1144,7 +1163,7 @@ def detalhes_playlist(usuario_id, playlist_id):
         conexao.close()
         return "Playlist não encontrada", 404
 
-    # 2. Busca as músicas da playlist incluindo explicitamente a duração!
+    # 2. Busca as músicas da playlist incluindo duração, spotify_url e capa_url!
     cursor.execute("""
         SELECT 
             m.id_musica,
@@ -1152,7 +1171,9 @@ def detalhes_playlist(usuario_id, playlist_id):
             m."duração" AS duracao,
             COALESCE(g.nome_genero, 'Sem Género') AS genero,
             COALESCE(al.nome_album, 'Sem Álbum') AS album,
-            COALESCE(art.nome_artista, mus.nome, 'Desconhecido') AS artista
+            COALESCE(art.nome_artista, mus.nome, 'Desconhecido') AS artista,
+            m.spotify_url,
+            m.capa_url
         FROM "PLAYLIST_MUSICA" pm
         JOIN "MUSICA" m ON pm.id_musica = m.id_musica
         LEFT JOIN "GENERO" g ON m.id_genero = g.id_genero
@@ -1167,6 +1188,7 @@ def detalhes_playlist(usuario_id, playlist_id):
     conexao.close()
 
     return render_template("detalhes_playlist.html", playlist=playlist, musicas_playlist=musicas_playlist, usuario_id=usuario_id)
+
 
 
 @app.route('/usuario/<int:usuario_id>/playlist/<int:playlist_id>/remover-musica/<int:musica_id>', methods=['POST'])
